@@ -27,13 +27,7 @@ import {
   deleteRssSource,
   deleteSchedule,
   deleteZone,
-  listLayouts,
-  listLayoutTimeline,
-  listMarketingMessages,
-  listMedia,
-  listRssSources,
-  listSchedules,
-  listZones,
+  loadBootstrapData,
   listZoneTimeline,
   putLayoutTimeline,
   putZoneTimelineBlocks,
@@ -43,11 +37,12 @@ import {
   upsertRssSource,
   updateZone,
 } from "@/lib/repo";
-import { getPlayerSettings, setPlayerSettings } from "@/lib/db";
+import { setPlayerSettings } from "@/lib/db";
 
 type AppState = {
   hidratado: boolean;
   carregando: boolean;
+  erroPainel: string | null;
   midias: MediaItem[];
   fontesRss: RssSource[];
   mensagensMarketing: MarketingMessage[];
@@ -117,6 +112,7 @@ function inferMediaType(file: File): MediaType {
 export const useAppStore = create<AppState>((set, get) => ({
   hidratado: false,
   carregando: false,
+  erroPainel: null,
   midias: [],
   fontesRss: [],
   mensagensMarketing: [],
@@ -127,39 +123,31 @@ export const useAppStore = create<AppState>((set, get) => ({
   player: null,
 
   hidratar: async () => {
-    if (get().carregando || get().hidratado) return;
-    set({ carregando: true });
-    const [
-      midias,
-      fontesRss,
-      mensagensMarketing,
-      layouts,
-      zonas,
-      timelineGlobal,
-      agendamentos,
-      player,
-    ] = await Promise.all([
-      listMedia(),
-      listRssSources(),
-      listMarketingMessages(),
-      listLayouts(),
-      listZones(),
-      listLayoutTimeline(),
-      listSchedules(),
-      getPlayerSettings(),
-    ]);
-    set({
-      midias,
-      fontesRss,
-      mensagensMarketing,
-      layouts,
-      zonas,
-      timelineGlobal,
-      agendamentos,
-      player,
-      hidratado: true,
-      carregando: false,
-    });
+    if (get().carregando || (get().hidratado && !get().erroPainel)) return;
+    set({ carregando: true, erroPainel: null });
+    try {
+      const bootstrap = await loadBootstrapData();
+      set({
+        midias: bootstrap.midias,
+        fontesRss: bootstrap.fontesRss,
+        mensagensMarketing: bootstrap.mensagensMarketing,
+        layouts: bootstrap.layouts,
+        zonas: bootstrap.zonas,
+        timelineGlobal: bootstrap.timelineGlobal,
+        agendamentos: bootstrap.agendamentos,
+        player: bootstrap.player,
+        hidratado: true,
+        carregando: false,
+        erroPainel: null,
+      });
+    } catch (error) {
+      console.error("Falha ao hidratar o painel", error);
+      set({
+        carregando: false,
+        erroPainel:
+          error instanceof Error ? error.message : "Falha ao carregar os dados do painel.",
+      });
+    }
   },
 
   criarMidia: async ({ file, nome, tags }) => {

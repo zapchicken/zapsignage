@@ -1,14 +1,4 @@
-import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type { PlayerSettings } from "@/lib/types";
-
-type PlayerSettingsRow = {
-  resolucao: string | null;
-  efeito_transicao: PlayerSettings["efeitoTransicao"] | null;
-  volume: number | null;
-  iniciar_tela_cheia: boolean | null;
-  modo_emergencia_ativo: boolean | null;
-  layout_emergencia_id: string | null;
-};
 
 export const defaultPlayerSettings: PlayerSettings = {
   resolucao: "1920x1080",
@@ -19,36 +9,35 @@ export const defaultPlayerSettings: PlayerSettings = {
 };
 
 export async function getPlayerSettings(): Promise<PlayerSettings> {
-  const supabase = getSupabaseBrowserClient();
-  const { data, error } = await supabase
-    .from("player_settings")
-    .select("*")
-    .eq("id", "playerSettings")
-    .maybeSingle();
-  if (error || !data) return defaultPlayerSettings;
-  const row = data as PlayerSettingsRow;
-  return {
-    resolucao: row.resolucao ?? defaultPlayerSettings.resolucao,
-    efeitoTransicao: row.efeito_transicao ?? defaultPlayerSettings.efeitoTransicao,
-    volume: Number(row.volume ?? defaultPlayerSettings.volume),
-    iniciarTelaCheia: row.iniciar_tela_cheia ?? defaultPlayerSettings.iniciarTelaCheia,
-    modoEmergenciaAtivo:
-      row.modo_emergencia_ativo ?? defaultPlayerSettings.modoEmergenciaAtivo,
-    layoutEmergenciaId: row.layout_emergencia_id ?? undefined,
+  const response = await fetch("/api/admin", {
+    method: "GET",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    return defaultPlayerSettings;
   };
+  const data = (await response.json()) as { player?: PlayerSettings };
+  return data.player ?? defaultPlayerSettings;
 }
 
 export async function setPlayerSettings(value: PlayerSettings) {
-  const supabase = getSupabaseBrowserClient();
-  const { error } = await supabase.from("player_settings").upsert({
-    id: "playerSettings",
-    resolucao: value.resolucao,
-    efeito_transicao: value.efeitoTransicao,
-    volume: value.volume,
-    iniciar_tela_cheia: value.iniciarTelaCheia,
-    modo_emergencia_ativo: value.modoEmergenciaAtivo,
-    layout_emergencia_id: value.layoutEmergenciaId ?? null,
+  const response = await fetch("/api/admin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      action: "setPlayerSettings",
+      payload: value,
+    }),
   });
-  if (error) throw error;
+  if (!response.ok) {
+    let erro = "Falha ao salvar as configurações do player.";
+    try {
+      const data = (await response.json()) as { erro?: string };
+      erro = data.erro ?? erro;
+    } catch {}
+    throw new Error(erro);
+  }
 }
 

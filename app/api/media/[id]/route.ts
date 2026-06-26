@@ -1,6 +1,7 @@
 import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
 import { Readable } from "node:stream";
+import { requireAdminSessionJson } from "@/lib/admin-auth";
 import { getR2Bucket, getR2Client } from "@/lib/r2";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -61,6 +62,9 @@ export async function GET(request: Request, { params }: Params) {
 }
 
 export async function DELETE(_request: Request, { params }: Params) {
+  const unauthorized = await requireAdminSessionJson();
+  if (unauthorized) return unauthorized;
+
   const { id } = await params;
   const media = await getMediaById(id);
   if (!media) {

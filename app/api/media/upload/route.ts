@@ -1,5 +1,6 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
+import { requireAdminSessionJson } from "@/lib/admin-auth";
 import { getR2Bucket, getR2Client } from "@/lib/r2";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -20,6 +21,9 @@ function sanitizeFileName(name: string) {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdminSessionJson();
+  if (unauthorized) return unauthorized;
+
   const form = await request.formData();
   const file = form.get("file");
   const nome = String(form.get("nome") ?? "").trim();
