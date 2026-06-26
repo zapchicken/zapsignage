@@ -1,6 +1,15 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import type { PlayerSettings } from "@/lib/types";
 
+type PlayerSettingsRow = {
+  resolucao: string | null;
+  efeito_transicao: PlayerSettings["efeitoTransicao"] | null;
+  volume: number | null;
+  iniciar_tela_cheia: boolean | null;
+  modo_emergencia_ativo: boolean | null;
+  layout_emergencia_id: string | null;
+};
+
 export const defaultPlayerSettings: PlayerSettings = {
   resolucao: "1920x1080",
   efeitoTransicao: "fade",
@@ -17,14 +26,15 @@ export async function getPlayerSettings(): Promise<PlayerSettings> {
     .eq("id", "playerSettings")
     .maybeSingle();
   if (error || !data) return defaultPlayerSettings;
+  const row = data as PlayerSettingsRow;
   return {
-    resolucao: data.resolucao ?? defaultPlayerSettings.resolucao,
-    efeitoTransicao: data.efeito_transicao ?? defaultPlayerSettings.efeitoTransicao,
-    volume: Number(data.volume ?? defaultPlayerSettings.volume),
-    iniciarTelaCheia: data.iniciar_tela_cheia ?? defaultPlayerSettings.iniciarTelaCheia,
+    resolucao: row.resolucao ?? defaultPlayerSettings.resolucao,
+    efeitoTransicao: row.efeito_transicao ?? defaultPlayerSettings.efeitoTransicao,
+    volume: Number(row.volume ?? defaultPlayerSettings.volume),
+    iniciarTelaCheia: row.iniciar_tela_cheia ?? defaultPlayerSettings.iniciarTelaCheia,
     modoEmergenciaAtivo:
-      data.modo_emergencia_ativo ?? defaultPlayerSettings.modoEmergenciaAtivo,
-    layoutEmergenciaId: data.layout_emergencia_id ?? undefined,
+      row.modo_emergencia_ativo ?? defaultPlayerSettings.modoEmergenciaAtivo,
+    layoutEmergenciaId: row.layout_emergencia_id ?? undefined,
   };
 }
 

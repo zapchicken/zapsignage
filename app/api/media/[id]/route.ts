@@ -4,6 +4,12 @@ import { Readable } from "node:stream";
 import { getR2Bucket, getR2Client } from "@/lib/r2";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
+type MediaRow = {
+  id: string;
+  mime_type: string | null;
+  r2_key: string;
+};
+
 type Params = {
   params: Promise<{ id: string }>;
 };
@@ -12,7 +18,7 @@ async function getMediaById(id: string) {
   const supabase = getSupabaseServerClient();
   const { data, error } = await supabase.from("media").select("*").eq("id", id).single();
   if (error || !data) return null;
-  return data;
+  return data as MediaRow;
 }
 
 function toWebStream(body: unknown) {

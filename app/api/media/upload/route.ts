@@ -3,6 +3,18 @@ import { NextResponse } from "next/server";
 import { getR2Bucket, getR2Client } from "@/lib/r2";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
+type MediaRow = {
+  id: string;
+  nome: string;
+  tipo: "video" | "imagem";
+  mime_type: string | null;
+  tags: string[] | null;
+  ativo: boolean;
+  r2_key: string;
+  public_url: string;
+  created_at: string;
+};
+
 function sanitizeFileName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]/g, "-");
 }
@@ -65,15 +77,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: error.message }, { status: 500 });
   }
 
+  const media = data as MediaRow;
+
   return NextResponse.json({
-    id: data.id,
-    nome: data.nome,
-    tipo: data.tipo,
-    mimeType: data.mime_type,
-    tags: data.tags ?? [],
-    ativo: data.ativo,
-    r2Key: data.r2_key,
-    publicUrl: data.public_url,
-    createdAt: new Date(data.created_at).getTime(),
+    id: media.id,
+    nome: media.nome,
+    tipo: media.tipo,
+    mimeType: media.mime_type,
+    tags: media.tags ?? [],
+    ativo: media.ativo,
+    r2Key: media.r2_key,
+    publicUrl: media.public_url,
+    createdAt: new Date(media.created_at).getTime(),
   });
 }
