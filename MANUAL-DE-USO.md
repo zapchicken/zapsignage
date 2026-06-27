@@ -1,17 +1,17 @@
-# Manual de Utilizacao - ZapChicken Digital Signage
+# Manual de Uso - ZapChicken Digital Signage
 
 ## 1. Visao Geral
 
-O ZapChicken Digital Signage e um sistema para gerenciar conteudo de TV corporativa, cardapios digitais, publicidade interna e avisos.
+O ZapChicken Digital Signage e um sistema para gerenciar conteudo de TV corporativa, cardapios digitais, publicidade interna e comunicados.
 
 O sistema possui duas areas principais:
 
 - Painel administrativo: cadastro e configuracao do conteudo
-- Player: exibicao fullscreen da programacao
+- Player: exibicao em tela cheia da programacao
 
 ## 2. Acesso ao Sistema
 
-Ao abrir a URL principal do sistema, a tela inicial sera a de login.
+Ao abrir a URL principal do sistema, a primeira tela sera a de login.
 
 Passos:
 
@@ -22,7 +22,7 @@ Passos:
 
 Rotas principais:
 
-- `/` : entrada do sistema
+- `/` : entrada principal do sistema
 - `/acesso` : tela de login
 - `/dashboard` : painel principal
 - `/player` : tela de exibicao
@@ -43,7 +43,7 @@ O menu lateral possui as seguintes areas:
 
 ## 4. Fluxo Recomendado de Configuracao
 
-Para montar uma tela do zero, use esta ordem:
+Para montar uma tela do zero, siga esta ordem:
 
 1. Cadastre as midias
 2. Cadastre fontes RSS, se necessario
@@ -71,7 +71,7 @@ Como usar:
 1. Clique em `+ Adicionar Midia`
 2. Escolha um arquivo de imagem ou video
 3. Aguarde o upload
-4. Verifique a miniatura na biblioteca
+4. Verifique a miniatura da midia na biblioteca
 
 Observacoes:
 
@@ -127,7 +127,7 @@ Funcao:
 - ativar ou desativar layouts
 - excluir layouts
 
-Exemplo:
+Exemplos:
 
 - um layout com video grande e ticker embaixo
 - um layout com imagem lateral e texto principal
@@ -154,8 +154,9 @@ Recursos importantes:
 
 - arrastar
 - redimensionar
-- snap liga/desliga
+- snap com liga/desliga
 - controle de camada com `z-index`
+- exclusao rapida da zona selecionada
 
 Configuracoes de ticker:
 
@@ -214,7 +215,7 @@ Tela: `/configuracoes`
 Funcao:
 
 - escolher efeito de transicao
-- configurar player
+- configurar o player
 - definir layout de emergencia
 
 Exemplos de uso:
@@ -225,6 +226,13 @@ Exemplos de uso:
 - flip
 - wipe
 
+Configuracoes importantes:
+
+- volume do player
+- inicio automatico em tela cheia
+- transicoes visuais
+- modo emergencia
+
 ## 13. Player
 
 Tela: `/player`
@@ -234,11 +242,13 @@ Funcao:
 - reproduzir o conteudo final
 - executar layouts, zonas e timelines
 - exibir ticker, imagens, videos e streams
+- aplicar o volume configurado no painel
 
 Recomendacao:
 
 - use o player em tela cheia
 - em TV Box, abra diretamente a rota `/player`
+- ajuste o volume em `/configuracoes` antes de testar o audio
 
 ## 14. Boas Praticas
 
@@ -266,6 +276,14 @@ Verifique:
 - se o upload foi concluido
 - se a midia esta ativa
 - se a zona correta esta programada na timeline
+
+### Video ou stream sem som
+
+Verifique:
+
+- se o volume do player esta acima de `0%`
+- se o navegador ou TV Box permite autoplay com audio
+- se o arquivo ou stream possui audio de origem
 
 ### Layout nao toca no player
 
@@ -314,4 +332,3 @@ Sempre que alterar variaveis:
 - Timelines: `/timelines`
 - Agendamentos: `/agendamentos`
 - Player: `/player`
-

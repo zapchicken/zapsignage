@@ -49,12 +49,15 @@ function ZoneMedia({
 }) {
   const midias = useAppStore((s) => s.midias);
   const settings = useAppStore((s) => s.player);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const block = useLoopingBlock(blocks);
   const media = useMemo(() => {
     if (!block?.mediaId) return null;
     return midias.find((m) => m.id === block.mediaId) ?? null;
   }, [block, midias]);
   const url = media?.publicUrl ?? null;
+  const volume = Math.max(0, Math.min(1, settings?.volume ?? 0.8));
+  const muted = volume <= 0;
 
   if (!block || !media || !url) {
     return (
@@ -96,16 +99,25 @@ function ZoneMedia({
     }
   })();
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || media?.tipo !== "video") return;
+    video.volume = volume;
+    video.muted = muted;
+    void video.play().catch(() => {});
+  }, [block?.id, media?.tipo, muted, volume]);
+
   if (media.tipo === "video") {
     return (
       <video
+        ref={videoRef}
         key={block.id}
         src={url}
         className={[
           "h-full w-full object-cover",
           anim,
         ].join(" ")}
-        muted
+        muted={muted}
         autoPlay
         playsInline
       />
@@ -126,8 +138,12 @@ function ZoneMedia({
 }
 
 function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
+  const settings = useAppStore((s) => s.player);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const block = useLoopingBlock(blocks);
   const url = block?.streamUrl?.trim();
+  const volume = Math.max(0, Math.min(1, settings?.volume ?? 0.8));
+  const muted = volume <= 0;
   if (!block || !url) {
     return (
       <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
@@ -136,14 +152,23 @@ function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
     );
   }
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !url.endsWith(".m3u8")) return;
+    video.volume = volume;
+    video.muted = muted;
+    void video.play().catch(() => {});
+  }, [block?.id, muted, url, volume]);
+
   if (url.endsWith(".m3u8")) {
     return (
       <video
+        ref={videoRef}
         key={block.id}
         src={url}
         className="h-full w-full object-cover"
         autoPlay
-        muted
+        muted={muted}
         playsInline
       />
     );
