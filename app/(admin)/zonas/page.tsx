@@ -278,10 +278,12 @@ function ZoneCanvas({
 function ZoneEditor({
   zone,
   onSave,
+  onDelete,
   onClose,
 }: {
   zone: Zone;
   onSave: (zone: Zone) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
   onClose: () => void;
 }) {
   const [draft, setDraft] = useState(zone);
@@ -455,6 +457,15 @@ function ZoneEditor({
         )}
       </div>
       <div className="mt-5 flex items-center justify-end gap-2">
+        <Button
+          variant="danger"
+          onClick={async () => {
+            await onDelete(draft.id);
+            onClose();
+          }}
+        >
+          Excluir Zona
+        </Button>
         <Button onClick={onClose}>Cancelar</Button>
         <Button
           variant="primary"
@@ -782,6 +793,13 @@ export default function ZonasPage() {
                       >
                         Enviar para trás
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => void removerZona(selecionada.id)}
+                      >
+                        Excluir Zona
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -1054,6 +1072,7 @@ export default function ZonasPage() {
         <ZoneEditor
           zone={editando}
           onSave={salvarZona}
+          onDelete={removerZona}
           onClose={() => setEditando(null)}
         />
       )}
