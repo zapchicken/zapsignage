@@ -58,15 +58,6 @@ function ZoneMedia({
   const url = media?.publicUrl ?? null;
   const volume = Math.max(0, Math.min(1, settings?.volume ?? 0.8));
   const muted = volume <= 0;
-
-  if (!block || !media || !url) {
-    return (
-      <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
-        Sem conteúdo
-      </div>
-    );
-  }
-
   const efeito = settings?.efeitoTransicao ?? "fade";
   const anim = (() => {
     switch (efeito) {
@@ -107,6 +98,14 @@ function ZoneMedia({
     void video.play().catch(() => {});
   }, [block?.id, media?.tipo, muted, volume]);
 
+  if (!block || !media || !url) {
+    return (
+      <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
+        Sem conteúdo
+      </div>
+    );
+  }
+
   if (media.tipo === "video") {
     return (
       <video
@@ -144,6 +143,16 @@ function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
   const url = block?.streamUrl?.trim();
   const volume = Math.max(0, Math.min(1, settings?.volume ?? 0.8));
   const muted = volume <= 0;
+  const isHls = url?.endsWith(".m3u8") ?? false;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isHls) return;
+    video.volume = volume;
+    video.muted = muted;
+    void video.play().catch(() => {});
+  }, [block?.id, isHls, muted, volume]);
+
   if (!block || !url) {
     return (
       <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
@@ -152,15 +161,7 @@ function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
     );
   }
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !url.endsWith(".m3u8")) return;
-    video.volume = volume;
-    video.muted = muted;
-    void video.play().catch(() => {});
-  }, [block?.id, muted, url, volume]);
-
-  if (url.endsWith(".m3u8")) {
+  if (isHls) {
     return (
       <video
         ref={videoRef}
