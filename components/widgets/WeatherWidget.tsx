@@ -160,22 +160,22 @@ export function WeatherWidget({
   const hoje = useMemo(() => data?.forecast?.[0] ?? null, [data]);
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_top,_#15315f,_#0b1120_55%)] text-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col p-4 md:p-6">
-        <div className="mb-5 rounded-3xl border border-white/10 bg-white/8 px-5 py-4 backdrop-blur-sm">
+    <div className="h-screen w-screen overflow-hidden bg-[radial-gradient(circle_at_top,_#fb923c_0%,_#f59e0b_28%,_#2a1708_58%,_#111827_100%)] text-white">
+      <div className="flex h-full w-full flex-col gap-4 p-3 md:gap-5 md:p-5">
+        <div className="rounded-[28px] border border-amber-300/20 bg-[linear-gradient(135deg,rgba(17,24,39,0.9),rgba(52,31,12,0.88))] px-6 py-5 shadow-[0_20px_80px_rgba(17,24,39,0.35)] backdrop-blur-sm">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-200/80">
+              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-200/85">
                 Widget de Tempo
               </div>
-              <div className="mt-1 text-3xl font-bold md:text-4xl">
+              <div className="mt-1 text-4xl font-bold leading-none md:text-5xl xl:text-6xl">
                 {data ? `${data.cidade}${data.estado ? `, ${data.estado}` : ""}` : `${cidade}, ${estado}`}
               </div>
-              <div className="mt-2 text-sm text-sky-100/80">
+              <div className="mt-3 text-base text-amber-50/85 md:text-lg">
                 Previsão para os próximos {Math.max(1, Math.min(10, dias))} dias
               </div>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-right text-sm text-sky-100/85">
+            <div className="rounded-2xl border border-amber-300/20 bg-black/25 px-5 py-4 text-right text-sm text-amber-50/90 md:min-w-48 md:text-base">
               <div className="font-semibold">Atualização</div>
               <div>{atualizadoEm ? formatarAtualizacao(atualizadoEm) : "Aguardando dados"}</div>
             </div>
@@ -183,7 +183,7 @@ export function WeatherWidget({
         </div>
 
         {carregando && !data ? (
-          <div className="flex flex-1 items-center justify-center rounded-3xl border border-white/10 bg-white/5 text-lg text-sky-100/85">
+          <div className="flex flex-1 items-center justify-center rounded-3xl border border-amber-300/15 bg-black/20 text-lg text-amber-50/90">
             Carregando previsão do tempo...
           </div>
         ) : erro && !data ? (
@@ -191,93 +191,109 @@ export function WeatherWidget({
             {erro}
           </div>
         ) : (
-          <>
+          <div className="flex min-h-0 flex-1 flex-col gap-4 md:gap-5">
             {hoje && (
-              <div className="mb-5 grid grid-cols-1 gap-4 xl:grid-cols-[1.2fr_.8fr]">
-                <div className="rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-sm">
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.45fr_.85fr]">
+                <div className="rounded-[28px] border border-amber-300/15 bg-[linear-gradient(180deg,rgba(17,24,39,0.86),rgba(36,23,10,0.88))] p-6 shadow-[0_12px_40px_rgba(17,24,39,0.28)] backdrop-blur-sm xl:min-h-72">
                   <div className="flex items-center gap-4">
-                    <WeatherIcon code={hoje.weatherCode} />
+                    <div className="scale-125 md:scale-150">
+                      <WeatherIcon code={hoje.weatherCode} />
+                    </div>
                     <div>
-                      <div className="text-sm uppercase tracking-[0.24em] text-sky-200/70">
+                      <div className="text-sm uppercase tracking-[0.24em] text-amber-200/75">
                         Hoje
                       </div>
-                      <div className="mt-1 text-2xl font-bold md:text-3xl">{hoje.weatherLabel}</div>
-                      <div className="mt-1 text-sm text-sky-100/80">{formatarDia(hoje.date)}</div>
+                      <div className="mt-2 text-3xl font-bold leading-tight md:text-4xl xl:text-5xl">
+                        {hoje.weatherLabel}
+                      </div>
+                      <div className="mt-2 text-base text-amber-50/80 md:text-lg">
+                        {formatarDia(hoje.date)}
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-5 flex flex-wrap items-end gap-5">
+                  <div className="mt-8 grid grid-cols-3 gap-4">
                     <div>
-                      <div className="text-xs uppercase tracking-[0.2em] text-sky-200/65">Máxima</div>
-                      <div className="text-4xl font-bold">{Math.round(hoje.tempMax)}°</div>
+                      <div className="text-xs uppercase tracking-[0.2em] text-amber-200/70">Máxima</div>
+                      <div className="text-5xl font-bold leading-none text-amber-300 md:text-6xl">
+                        {Math.round(hoje.tempMax)}°
+                      </div>
                     </div>
                     <div>
-                      <div className="text-xs uppercase tracking-[0.2em] text-sky-200/65">Mínima</div>
-                      <div className="text-3xl font-semibold text-sky-100/90">
+                      <div className="text-xs uppercase tracking-[0.2em] text-amber-200/70">Mínima</div>
+                      <div className="text-4xl font-semibold leading-none text-amber-50/95 md:text-5xl">
                         {Math.round(hoje.tempMin)}°
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs uppercase tracking-[0.2em] text-sky-200/65">Chuva</div>
-                      <div className="text-3xl font-semibold text-sky-100/90">
+                      <div className="text-xs uppercase tracking-[0.2em] text-amber-200/70">Chuva</div>
+                      <div className="text-4xl font-semibold leading-none text-amber-50/95 md:text-5xl">
                         {hoje.precipitationProbabilityMax ?? 0}%
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-white/10 bg-white/8 p-5 backdrop-blur-sm">
-                  <div className="text-sm uppercase tracking-[0.24em] text-sky-200/70">Resumo</div>
-                  <div className="mt-4 grid grid-cols-1 gap-3 text-sm text-sky-100/85">
-                    <div className="rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
+                <div className="rounded-[28px] border border-amber-300/15 bg-[linear-gradient(180deg,rgba(17,24,39,0.86),rgba(36,23,10,0.88))] p-6 shadow-[0_12px_40px_rgba(17,24,39,0.28)] backdrop-blur-sm xl:min-h-72">
+                  <div className="text-sm uppercase tracking-[0.24em] text-amber-200/75 md:text-base">
+                    Resumo
+                  </div>
+                  <div className="mt-4 grid h-[calc(100%-2rem)] grid-cols-1 gap-4 text-base text-amber-50/90">
+                    <div className="rounded-2xl border border-amber-300/15 bg-black/20 px-5 py-4">
                       <div className="font-semibold">Local</div>
-                      <div>
+                      <div className="mt-1 text-lg">
                         {data?.cidade ?? cidade}
                         {data?.estado ? `, ${data.estado}` : estado ? `, ${estado}` : ""}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
+                    <div className="rounded-2xl border border-amber-300/15 bg-black/20 px-5 py-4">
                       <div className="font-semibold">Fuso</div>
-                      <div>{data?.timezone ?? "America/Sao_Paulo"}</div>
+                      <div className="mt-1 text-lg">{data?.timezone ?? "America/Sao_Paulo"}</div>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
+                    <div className="rounded-2xl border border-amber-300/15 bg-black/20 px-5 py-4">
                       <div className="font-semibold">Condição atual</div>
-                      <div>{iconeClima(hoje.weatherCode)}</div>
+                      <div className="mt-1 text-lg">{iconeClima(hoje.weatherCode)}</div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+            <div className="grid min-h-0 flex-1 auto-rows-fr grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
               {(data?.forecast ?? []).map((day) => (
                 <div
                   key={day.date}
-                  className="rounded-3xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm"
+                  className="flex h-full flex-col rounded-[24px] border border-amber-300/15 bg-[linear-gradient(180deg,rgba(17,24,39,0.84),rgba(45,27,11,0.84))] p-4 shadow-[0_10px_28px_rgba(17,24,39,0.22)] backdrop-blur-sm md:p-5"
                 >
-                  <div className="text-sm font-semibold uppercase tracking-[0.16em] text-sky-200/75">
+                  <div className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-200/75 md:text-base">
                     {formatarDia(day.date)}
                   </div>
-                  <div className="mt-3 flex items-center gap-3">
-                    <WeatherIcon code={day.weatherCode} />
+                  <div className="mt-3 flex items-center gap-4">
+                    <div className="scale-110 md:scale-125">
+                      <WeatherIcon code={day.weatherCode} />
+                    </div>
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold">{day.weatherLabel}</div>
-                      <div className="text-xs text-sky-100/75">
+                      <div className="line-clamp-2 text-base font-semibold leading-tight md:text-lg">
+                        {day.weatherLabel}
+                      </div>
+                      <div className="mt-1 text-sm text-amber-50/75 md:text-base">
                         Chuva: {day.precipitationProbabilityMax ?? 0}%
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4 flex items-end justify-between">
+                  <div className="mt-auto flex items-end justify-between pt-5">
                     <div>
-                      <div className="text-[11px] uppercase tracking-[0.16em] text-sky-200/65">
+                      <div className="text-[11px] uppercase tracking-[0.16em] text-amber-200/70">
                         Máx
                       </div>
-                      <div className="text-2xl font-bold">{Math.round(day.tempMax)}°</div>
+                      <div className="text-3xl font-bold leading-none text-amber-300 md:text-4xl">
+                        {Math.round(day.tempMax)}°
+                      </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[11px] uppercase tracking-[0.16em] text-sky-200/65">
+                      <div className="text-[11px] uppercase tracking-[0.16em] text-amber-200/70">
                         Mín
                       </div>
-                      <div className="text-xl font-semibold text-sky-100/90">
+                      <div className="text-2xl font-semibold leading-none text-amber-50/95 md:text-3xl">
                         {Math.round(day.tempMin)}°
                       </div>
                     </div>
@@ -287,11 +303,11 @@ export function WeatherWidget({
             </div>
 
             {erro && data && (
-              <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50">
+              <div className="mt-4 rounded-2xl border border-amber-300/30 bg-[rgba(251,146,60,0.14)] px-4 py-3 text-sm text-amber-50">
                 Exibindo a última previsão carregada. Detalhe: {erro}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

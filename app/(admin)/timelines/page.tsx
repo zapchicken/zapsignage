@@ -87,6 +87,8 @@ export default function TimelinesPage() {
   const [carregando, setCarregando] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [erroCarregar, setErroCarregar] = useState<string>("");
+  const [erroTimelineGlobal, setErroTimelineGlobal] = useState<string>("");
+  const [salvandoTimelineGlobal, setSalvandoTimelineGlobal] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -230,7 +232,10 @@ export default function TimelinesPage() {
   };
 
   const [globalItems, setGlobalItems] = useState<LayoutTimelineItem[]>(timelineGlobal);
-  useEffect(() => setGlobalItems(timelineGlobal), [timelineGlobal]);
+  useEffect(() => {
+    const validLayoutIds = new Set(layouts.map((layout) => layout.id));
+    setGlobalItems(timelineGlobal.filter((item) => validLayoutIds.has(item.layoutId)));
+  }, [layouts, timelineGlobal]);
 
   const onDragEndGlobal = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -244,6 +249,27 @@ export default function TimelinesPage() {
     setGlobalItems(next);
   };
 
+  const salvarGlobal = async () => {
+    setErroTimelineGlobal("");
+    setSalvandoTimelineGlobal(true);
+    try {
+      const validLayoutIds = new Set(layouts.map((layout) => layout.id));
+      const normalized = globalItems
+        .filter((item) => validLayoutIds.has(item.layoutId))
+        .map((item, idx) => ({ ...item, ordem: idx + 1 }));
+      await salvarTimelineGlobal(normalized);
+      setGlobalItems(normalized);
+    } catch (error) {
+      setErroTimelineGlobal(
+        error instanceof Error
+          ? error.message
+          : "Falha ao salvar a timeline global.",
+      );
+    } finally {
+      setSalvandoTimelineGlobal(false);
+    }
+  };
+
   return (
     <div className="flex w-full flex-col gap-6">
       <Card
@@ -251,14 +277,14 @@ export default function TimelinesPage() {
         description="Sequência de blocos (mídia, RSS, texto, stream) com loop infinito"
         actions={
           <Button variant="primary" onClick={() => void salvar()} disabled={!zoneId || salvando}>
-            {salvando ? "Salvando…" : "Salvar Timeline"}
+            {salvando ? "Salvando..." : "Salvar Timeline"}
           </Button>
         }
       >
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <Select value={layoutId} onChange={(e) => setLayoutId(e.target.value)}>
-              <option value="">Selecione um layout…</option>
+              <option value="">Selecione um layout...</option>
               {layouts
                 .slice()
                 .sort((a, b) => a.nome.localeCompare(b.nome))
@@ -271,7 +297,7 @@ export default function TimelinesPage() {
           </div>
           <div className="lg:col-span-4">
             <Select value={zoneId} onChange={(e) => setZoneId(e.target.value)} disabled={!layoutId}>
-              <option value="">Selecione uma zona…</option>
+              <option value="">Selecione uma zona...</option>
               {zonasDoLayout
                 .slice()
                 .sort((a, b) => a.nome.localeCompare(b.nome))
@@ -313,7 +339,7 @@ export default function TimelinesPage() {
           <div className="lg:col-span-7">
             {novoTipo === "media" ? (
               <Select value={novoMediaId} onChange={(e) => setNovoMediaId(e.target.value)} disabled={!zoneId}>
-                <option value="">Selecione uma mídia…</option>
+                <option value="">Selecione uma mídia...</option>
                 {midias
                   .filter((m) => m.ativo)
                   .slice()
@@ -326,7 +352,7 @@ export default function TimelinesPage() {
               </Select>
             ) : novoTipo === "rss" ? (
               <Select value={novoRssId} onChange={(e) => setNovoRssId(e.target.value)} disabled={!zoneId}>
-                <option value="">Selecione uma fonte RSS…</option>
+                <option value="">Selecione uma fonte RSS...</option>
                 {fontesRss
                   .filter((f) => f.ativo)
                   .slice()
@@ -339,14 +365,14 @@ export default function TimelinesPage() {
               </Select>
             ) : novoTipo === "texto" ? (
               <Input
-                placeholder="Texto…"
+                placeholder="Texto..."
                 value={novoTexto}
                 onChange={(e) => setNovoTexto(e.target.value)}
                 disabled={!zoneId}
               />
             ) : (
               <Input
-                placeholder="URL do stream (m3u8/embed)…"
+                placeholder="URL do stream (m3u8/embed)..."
                 value={novoStreamUrl}
                 onChange={(e) => setNovoStreamUrl(e.target.value)}
                 disabled={!zoneId}
@@ -372,7 +398,7 @@ export default function TimelinesPage() {
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div>
                 <div className="text-sm font-semibold">Widget interno de tempo</div>
-                <div className="text-xs text-zinc-600 dark:text-zinc-300">
+                <div className="text-xs text-foreground/72">
                   Gere uma URL pronta para usar a previsão por cidade em uma zona de stream.
                 </div>
               </div>
@@ -422,7 +448,7 @@ export default function TimelinesPage() {
               </div>
             </div>
 
-            <div className="mt-3 rounded-xl border border-border bg-card px-4 py-3 text-xs text-zinc-600 dark:text-zinc-300">
+            <div className="mt-3 rounded-xl border border-border bg-card px-4 py-3 text-xs text-foreground/72">
               URL gerada: <span className="font-mono text-[11px]">{weatherWidgetUrl}</span>
             </div>
           </div>
@@ -430,11 +456,11 @@ export default function TimelinesPage() {
 
         <div className="mt-5">
           {carregando ? (
-            <div className="rounded-xl border border-border bg-muted p-6 text-center text-sm text-zinc-600 dark:text-zinc-300">
-              Carregando timeline…
+            <div className="rounded-xl border border-border bg-muted p-6 text-center text-sm text-foreground/72">
+              Carregando timeline...
             </div>
           ) : erroCarregar ? (
-            <div className="rounded-xl border border-border bg-muted p-6 text-center text-sm text-zinc-600 dark:text-zinc-300">
+            <div className="rounded-xl border border-border bg-muted p-6 text-center text-sm text-foreground/72">
               {erroCarregar}
             </div>
           ) : (
@@ -445,8 +471,8 @@ export default function TimelinesPage() {
                     <SortableRow key={b.id} id={b.id}>
                       <div className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
-                          <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
-                            {tipoLabel(b.tipo)} • {b.duracao}s
+                          <div className="text-xs font-semibold text-foreground/72">
+                            {tipoLabel(b.tipo)} ⬢ {b.duracao}s
                           </div>
                           <div className="truncate text-sm font-semibold">
                             {b.tipo === "media"
@@ -459,7 +485,7 @@ export default function TimelinesPage() {
                           </div>
                           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                             <div>
-                              <div className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                              <div className="text-[11px] font-semibold text-foreground/72">
                                 Duração (s)
                               </div>
                               <Input
@@ -475,7 +501,7 @@ export default function TimelinesPage() {
 
                             {b.tipo === "media" ? (
                               <div className="sm:col-span-2">
-                                <div className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                                <div className="text-[11px] font-semibold text-foreground/72">
                                   Mídia
                                 </div>
                                 <Select
@@ -484,7 +510,7 @@ export default function TimelinesPage() {
                                     atualizarBloco(b.id, { mediaId: e.target.value || undefined })
                                   }
                                 >
-                                  <option value="">Selecione uma mídia…</option>
+                                  <option value="">Selecione uma mídia...</option>
                                   {midias
                                     .filter((m) => m.ativo)
                                     .slice()
@@ -498,7 +524,7 @@ export default function TimelinesPage() {
                               </div>
                             ) : b.tipo === "rss" ? (
                               <div className="sm:col-span-2">
-                                <div className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                                <div className="text-[11px] font-semibold text-foreground/72">
                                   Fonte RSS
                                 </div>
                                 <Select
@@ -507,7 +533,7 @@ export default function TimelinesPage() {
                                     atualizarBloco(b.id, { rssSourceId: e.target.value || undefined })
                                   }
                                 >
-                                  <option value="">Selecione uma fonte RSS…</option>
+                                  <option value="">Selecione uma fonte RSS...</option>
                                   {fontesRss
                                     .filter((f) => f.ativo)
                                     .slice()
@@ -521,7 +547,7 @@ export default function TimelinesPage() {
                               </div>
                             ) : b.tipo === "texto" ? (
                               <div className="sm:col-span-2">
-                                <div className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                                <div className="text-[11px] font-semibold text-foreground/72">
                                   Texto
                                 </div>
                                 <Input
@@ -531,7 +557,7 @@ export default function TimelinesPage() {
                               </div>
                             ) : (
                               <div className="sm:col-span-2">
-                                <div className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                                <div className="text-[11px] font-semibold text-foreground/72">
                                   URL do Stream
                                 </div>
                                 <Input
@@ -557,7 +583,7 @@ export default function TimelinesPage() {
                     </SortableRow>
                   ))}
                   {!blocks.length && (
-                    <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                    <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center text-sm text-foreground/72">
                       Adicione blocos para montar a timeline desta zona.
                     </div>
                   )}
@@ -574,10 +600,10 @@ export default function TimelinesPage() {
         actions={
           <Button
             variant="primary"
-            onClick={() => void salvarTimelineGlobal(globalItems.map((it, idx) => ({ ...it, ordem: idx + 1 })))}
+            onClick={() => void salvarGlobal()}
             disabled={!globalItems.length}
           >
-            Salvar Timeline Global
+            {salvandoTimelineGlobal ? "Salvando..." : "Salvar Timeline Global"}
           </Button>
         }
       >
@@ -593,7 +619,7 @@ export default function TimelinesPage() {
                 e.target.value = "";
               }}
             >
-              <option value="">Adicionar layout…</option>
+              <option value="">Adicionar layout...</option>
               {layouts
                 .filter((l) => l.ativo)
                 .slice()
@@ -614,6 +640,11 @@ export default function TimelinesPage() {
         </div>
 
         <div className="mt-5">
+          {erroTimelineGlobal ? (
+            <div className="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
+              {erroTimelineGlobal}
+            </div>
+          ) : null}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEndGlobal}>
             <SortableContext items={globalItems.map((b) => b.id)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
@@ -624,7 +655,7 @@ export default function TimelinesPage() {
                         <div className="truncate text-sm font-semibold">
                           {layouts.find((l) => l.id === it.layoutId)?.nome ?? "Layout"}
                         </div>
-                        <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                        <div className="text-xs text-foreground/60">
                           Duração: {it.duracao}s
                         </div>
                       </div>
@@ -650,7 +681,7 @@ export default function TimelinesPage() {
                   </SortableRow>
                 ))}
                 {!globalItems.length && (
-                  <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <div className="rounded-xl border border-dashed border-border bg-muted p-8 text-center text-sm text-foreground/72">
                     Adicione layouts para montar a timeline global.
                   </div>
                 )}
@@ -662,4 +693,5 @@ export default function TimelinesPage() {
     </div>
   );
 }
+
 

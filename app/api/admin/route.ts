@@ -221,6 +221,13 @@ function playerFromRow(row: PlayerSettingsRow | null | undefined): PlayerSetting
   };
 }
 
+function filterItemsWithValidLayout<T extends { layoutId: string }>(
+  items: T[],
+  validLayoutIds: Set<string>,
+) {
+  return items.filter((item) => validLayoutIds.has(item.layoutId));
+}
+
 function errorResponse(error: unknown, status = 500) {
   const message = error instanceof Error ? error.message : "Erro interno.";
   return NextResponse.json({ erro: message }, { status });
@@ -263,14 +270,25 @@ export async function GET() {
       playerRes.error;
     if (firstError) throw new Error(firstError.message);
 
+    const layouts = (layoutsRes.data as LayoutRow[]).map(layoutFromRow);
+    const validLayoutIds = new Set(layouts.map((layout) => layout.id));
+    const timelineGlobal = filterItemsWithValidLayout(
+      (layoutTimelineRes.data as LayoutTimelineRow[]).map(layoutTimelineFromRow),
+      validLayoutIds,
+    );
+    const agendamentos = filterItemsWithValidLayout(
+      (schedulesRes.data as ScheduleRow[]).map(scheduleFromRow),
+      validLayoutIds,
+    );
+
     return NextResponse.json({
       midias: (mediaRes.data as MediaRow[]).map(mediaFromRow),
       fontesRss: (rssRes.data as RssSourceRow[]).map(rssFromRow),
       mensagensMarketing: (marketingRes.data as MarketingMessageRow[]).map(marketingFromRow),
-      layouts: (layoutsRes.data as LayoutRow[]).map(layoutFromRow),
+      layouts,
       zonas: (zonesRes.data as ZoneRow[]).map(zoneFromRow),
-      timelineGlobal: (layoutTimelineRes.data as LayoutTimelineRow[]).map(layoutTimelineFromRow),
-      agendamentos: (schedulesRes.data as ScheduleRow[]).map(scheduleFromRow),
+      timelineGlobal,
+      agendamentos,
       player: playerFromRow((playerRes.data as PlayerSettingsRow | null) ?? null),
     });
   } catch (error) {
@@ -472,11 +490,21 @@ export async function POST(request: Request) {
 
       case "putLayoutTimeline": {
         const input = payload as { items: LayoutTimelineItem[] };
+        const { data: layoutsData, error: layoutsError } = await supabase
+          .from("layouts")
+          .select("id");
+        if (layoutsError) throw new Error(layoutsError.message);
+
+        const validLayoutIds = new Set(
+          ((layoutsData ?? []) as Array<{ id: string }>).map((layout) => layout.id),
+        );
+        const validItems = filterItemsWithValidLayout(input.items, validLayoutIds);
+
         const { error: deleteError } = await supabase.from("layout_timeline").delete().neq("id", "");
         if (deleteError) throw new Error(deleteError.message);
-        if (input.items.length) {
+        if (validItems.length) {
           const { error } = await supabase.from("layout_timeline").insert(
-            input.items.map((item, index) => ({
+            validItems.map((item, index) => ({
               id: item.id,
               layout_id: item.layoutId,
               duracao: item.duracao,

@@ -7,6 +7,7 @@ type GeocodingResult = {
   country_code?: string;
   country?: string;
   admin1?: string;
+  admin2?: string;
   timezone?: string;
 };
 
@@ -50,6 +51,36 @@ const weatherCodeLabels: Record<number, string> = {
   99: "Trovoadas com granizo forte",
 };
 
+const estadoAliasBrasil: Record<string, string> = {
+  AC: "acre",
+  AL: "alagoas",
+  AP: "amapa",
+  AM: "amazonas",
+  BA: "bahia",
+  CE: "ceara",
+  DF: "distrito federal",
+  ES: "espirito santo",
+  GO: "goias",
+  MA: "maranhao",
+  MT: "mato grosso",
+  MS: "mato grosso do sul",
+  MG: "minas gerais",
+  PA: "para",
+  PB: "paraiba",
+  PR: "parana",
+  PE: "pernambuco",
+  PI: "piaui",
+  RJ: "rio de janeiro",
+  RN: "rio grande do norte",
+  RS: "rio grande do sul",
+  RO: "rondonia",
+  RR: "roraima",
+  SC: "santa catarina",
+  SP: "sao paulo",
+  SE: "sergipe",
+  TO: "tocantins",
+};
+
 function clampDays(value: string | null) {
   const days = Number(value ?? "10");
   if (!Number.isFinite(days)) return 10;
@@ -58,6 +89,52 @@ function clampDays(value: string | null) {
 
 function weatherLabelFromCode(code: number) {
   return weatherCodeLabels[code] ?? "Condição indisponível";
+}
+
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function matchesEstado(location: GeocodingResult, estado: string, pais: string) {
+  if (!estado) return true;
+
+  const estadoNormalizado = normalizeText(estado);
+  const admin1Normalizado = normalizeText(location.admin1 ?? "");
+  const admin2Normalizado = normalizeText(location.admin2 ?? "");
+
+  if (!estadoNormalizado) return true;
+  if (admin1Normalizado.includes(estadoNormalizado)) return true;
+  if (admin2Normalizado.includes(estadoNormalizado)) return true;
+
+  if (pais === "BR" && estado.length === 2) {
+    const alias = estadoAliasBrasil[estado.toUpperCase()];
+    if (alias && admin1Normalizado.includes(alias)) return true;
+  }
+
+  return false;
+}
+
+async function fetchGeocodingResults(busca: string, pais: string) {
+  const geocodingUrl = new URL("https://geocoding-api.open-meteo.com/v1/search");
+  geocodingUrl.searchParams.set("name", busca);
+  geocodingUrl.searchParams.set("count", "10");
+  geocodingUrl.searchParams.set("language", "pt");
+  geocodingUrl.searchParams.set("format", "json");
+  if (pais) geocodingUrl.searchParams.set("countryCode", pais);
+
+  const geocodingRes = await fetch(geocodingUrl, {
+    next: { revalidate: 60 * 60 * 6 },
+  });
+  if (!geocodingRes.ok) {
+    throw new Error("Falha ao localizar a cidade.");
+  }
+
+  const geocodingData = (await geocodingRes.json()) as { results?: GeocodingResult[] };
+  return geocodingData.results ?? [];
 }
 
 export async function GET(request: Request) {
@@ -72,27 +149,17 @@ export async function GET(request: Request) {
   }
 
   try {
-    const busca = [cidade, estado].filter(Boolean).join(", ");
-    const geocodingUrl = new URL("https://geocoding-api.open-meteo.com/v1/search");
-    geocodingUrl.searchParams.set("name", busca);
-    geocodingUrl.searchParams.set("count", "10");
-    geocodingUrl.searchParams.set("language", "pt");
-    geocodingUrl.searchParams.set("format", "json");
-    if (pais) geocodingUrl.searchParams.set("countryCode", pais);
-
-    const geocodingRes = await fetch(geocodingUrl, {
-      next: { revalidate: 60 * 60 * 6 },
-    });
-    if (!geocodingRes.ok) {
-      throw new Error("Falha ao localizar a cidade.");
+    const buscas = Array.from(
+      new Set([[cidade, estado].filter(Boolean).join(", "), cidade].filter(Boolean)),
+    );
+    let resultados: GeocodingResult[] = [];
+    for (const busca of buscas) {
+      resultados = await fetchGeocodingResults(busca, pais);
+      if (resultados.length) break;
     }
 
-    const geocodingData = (await geocodingRes.json()) as { results?: GeocodingResult[] };
     const location =
-      geocodingData.results?.find((item) =>
-        estado ? item.admin1?.toLowerCase().includes(estado.toLowerCase()) : true,
-      ) ??
-      geocodingData.results?.[0];
+      resultados.find((item) => matchesEstado(item, estado, pais)) ?? resultados[0];
 
     if (!location) {
       return NextResponse.json(
