@@ -69,22 +69,62 @@ export async function addMedia(input: {
   tipo: MediaType;
   mimeType: string;
   tags: string[];
-  blob: Blob;
+  file: File;
 }) {
-  const form = new FormData();
-  form.append("file", input.blob);
-  form.append("nome", input.nome);
-  form.append("tipo", input.tipo);
-  form.append("mimeType", input.mimeType);
-  form.append("tags", JSON.stringify(input.tags));
-
-  const res = await fetch("/api/media/upload", {
+  const initRes = await fetch("/api/media/upload-url", {
     method: "POST",
-    body: form,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      fileName: input.file.name,
+      tipo: input.tipo,
+      mimeType: input.mimeType,
+      fileSize: input.file.size,
+    }),
   });
-  if (!res.ok) throw new Error(await readJsonError(res));
-  const item = (await res.json()) as MediaItem;
-  return item;
+  if (!initRes.ok) throw new Error(await readJsonError(initRes));
+
+  const upload = (await initRes.json()) as {
+    id: string;
+    r2Key: string;
+    uploadUrl: string;
+    publicUrl: string;
+  };
+
+  const uploadRes = await fetch(upload.uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": input.mimeType,
+    },
+    body: input.file,
+  }).catch(() => {
+    throw new Error(
+      "Falha ao enviar o arquivo diretamente para o Cloudflare R2. Verifique o CORS do bucket para o domínio do painel.",
+    );
+  });
+  if (!uploadRes.ok) {
+    throw new Error("Falha ao enviar o arquivo diretamente para o Cloudflare R2.");
+  }
+
+  const completeRes = await fetch("/api/media/upload-complete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id: upload.id,
+      nome: input.nome,
+      tipo: input.tipo,
+      mimeType: input.mimeType,
+      tags: input.tags,
+      r2Key: upload.r2Key,
+      publicUrl: upload.publicUrl,
+    }),
+  });
+  if (!completeRes.ok) throw new Error(await readJsonError(completeRes));
+
+  return (await completeRes.json()) as MediaItem;
 }
 
 export async function toggleMediaAtivo(id: string, ativo: boolean) {

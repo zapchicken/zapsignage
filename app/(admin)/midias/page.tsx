@@ -18,6 +18,9 @@ type MediaUsage = {
   totalObjects: number;
   usagePercent: number;
   limitSource: string;
+  platformUploadLimitBytes: number | null;
+  platformUploadLimitSource: string;
+  directUploadEnabled: boolean;
 };
 
 function formatBytes(value: number) {
@@ -108,13 +111,22 @@ export default function MidiasPage() {
   const carregarUso = async () => {
     setCarregandoUso(true);
     try {
+      // #region debug-point B:client-usage-start
+      fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "B", location: "app/(admin)/midias/page.tsx:111", msg: "[DEBUG] client requested media usage", data: {}, ts: Date.now() }) }).catch(() => {});
+      // #endregion
       const response = await fetch("/api/media/usage", { cache: "no-store" });
       const data = (await response.json()) as MediaUsage & { erro?: string };
       if (!response.ok) {
         throw new Error(data.erro ?? "Falha ao consultar o uso do armazenamento.");
       }
+      // #region debug-point B:client-usage-ok
+      fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "B", location: "app/(admin)/midias/page.tsx:118", msg: "[DEBUG] client received media usage", data: { totalBytes: data.totalBytes, remainingBytes: data.remainingBytes, usagePercent: data.usagePercent }, ts: Date.now() }) }).catch(() => {});
+      // #endregion
       setUsoMidias(data);
     } catch (error) {
+      // #region debug-point B:client-usage-fail
+      fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "B", location: "app/(admin)/midias/page.tsx:122", msg: "[DEBUG] client media usage failed", data: { error: error instanceof Error ? error.message : String(error) }, ts: Date.now() }) }).catch(() => {});
+      // #endregion
       setErroUpload(
         error instanceof Error
           ? error.message
@@ -161,7 +173,13 @@ export default function MidiasPage() {
                 const file = e.target.files?.[0];
                 if (!file) return;
                 setErroUpload("");
+                // #region debug-point A:client-file-selected
+                fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "A", location: "app/(admin)/midias/page.tsx:165", msg: "[DEBUG] client selected file for upload", data: { fileName: file.name, fileSize: file.size, fileType: file.type, remainingBytes: usoMidias?.remainingBytes ?? null }, ts: Date.now() }) }).catch(() => {});
+                // #endregion
                 if (usoMidias && file.size > usoMidias.remainingBytes) {
+                  // #region debug-point A:client-limit-block
+                  fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "A", location: "app/(admin)/midias/page.tsx:168", msg: "[DEBUG] client blocked file by remaining space", data: { fileSize: file.size, remainingBytes: usoMidias.remainingBytes }, ts: Date.now() }) }).catch(() => {});
+                  // #endregion
                   setErroUpload(
                     `Arquivo bloqueado: ${formatBytes(file.size)} excede o espaço restante de ${formatBytes(usoMidias.remainingBytes)}.`,
                   );
@@ -173,9 +191,18 @@ export default function MidiasPage() {
                   .map((t) => t.trim())
                   .filter(Boolean);
                 try {
+                  // #region debug-point E:client-upload-start
+                  fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "E", location: "app/(admin)/midias/page.tsx:181", msg: "[DEBUG] client started media upload", data: { fileName: file.name, fileSize: file.size, tagCount: parsedTags.length }, ts: Date.now() }) }).catch(() => {});
+                  // #endregion
                   await criarMidia({ file, tags: parsedTags });
+                  // #region debug-point E:client-upload-ok
+                  fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "E", location: "app/(admin)/midias/page.tsx:184", msg: "[DEBUG] client media upload resolved successfully", data: { fileName: file.name }, ts: Date.now() }) }).catch(() => {});
+                  // #endregion
                   await carregarUso();
                 } catch (error) {
+                  // #region debug-point E:client-upload-fail
+                  fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "E", location: "app/(admin)/midias/page.tsx:188", msg: "[DEBUG] client media upload failed", data: { error: error instanceof Error ? error.message : String(error), fileName: file.name, fileSize: file.size }, ts: Date.now() }) }).catch(() => {});
+                  // #endregion
                   setErroUpload(
                     error instanceof Error ? error.message : "Falha ao enviar a mídia.",
                   );
@@ -205,6 +232,25 @@ export default function MidiasPage() {
             </div>
             <div className="mt-1 text-sm text-foreground/72">
               Referência do app para o plano gratuito do R2
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-muted p-4 lg:col-span-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60">
+              Limite por envio
+            </div>
+            <div className="mt-2 text-2xl font-semibold">
+              {usoMidias?.directUploadEnabled
+                ? "Upload direto para o R2"
+                : usoMidias?.platformUploadLimitBytes
+                  ? formatBytes(usoMidias.platformUploadLimitBytes)
+                  : "Sem limite do ambiente local"}
+            </div>
+            <div className="mt-1 text-sm text-foreground/72">
+              {usoMidias?.directUploadEnabled
+                ? "Arquivos seguem do navegador direto para o Cloudflare R2, contornando o limite de 4,5 MB da Vercel."
+                : usoMidias?.platformUploadLimitBytes
+                  ? "No deploy da Vercel, arquivos maiores precisam de upload direto para o R2."
+                  : "No ambiente local, o gargalo de 4,5 MB da Vercel não se aplica."}
             </div>
           </div>
           <div className="rounded-2xl border border-border bg-muted p-4 lg:col-span-4">

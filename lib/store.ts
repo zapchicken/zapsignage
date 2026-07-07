@@ -156,7 +156,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       tipo: inferMediaType(file),
       mimeType: file.type || "application/octet-stream",
       tags: (tags ?? []).filter(Boolean),
-      blob: file,
+      file,
     });
     set({ midias: [item, ...get().midias] });
   },

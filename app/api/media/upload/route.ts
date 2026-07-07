@@ -35,6 +35,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "Dados inválidos." }, { status: 400 });
   }
 
+  // #region debug-point A:upload-input
+  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "A", location: "app/api/media/upload/route.ts:37", msg: "[DEBUG] media upload input accepted", data: { nome, tipo, mimeType, fileName: file.name, fileSize: file.size }, ts: Date.now() }) }).catch(() => {});
+  // #endregion
+
   const id = crypto.randomUUID();
   const safeName = sanitizeFileName(file.name || `${id}`);
   const prefix = tipo === "video" ? "videos" : "imagens";
@@ -42,10 +46,22 @@ export async function POST(request: Request) {
   const buffer = Buffer.from(await file.arrayBuffer());
   const fileSize = buffer.byteLength;
   const limitBytes = getR2StorageLimitBytes();
-  const { totalBytes } = await getR2UsageBytes();
+  const { totalBytes } = await getR2UsageBytes().catch((error) => {
+    // #region debug-point B:usage-error
+    void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "B", location: "app/api/media/upload/route.ts:47", msg: "[DEBUG] media usage lookup failed before upload", data: { error: error instanceof Error ? error.message : String(error) }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
+    throw error;
+  });
+
+  // #region debug-point A:usage-state
+  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "A", location: "app/api/media/upload/route.ts:54", msg: "[DEBUG] media usage state resolved", data: { totalBytes, limitBytes, fileSize, projectedBytes: totalBytes + fileSize }, ts: Date.now() }) }).catch(() => {});
+  // #endregion
 
   if (totalBytes + fileSize > limitBytes) {
     const remainingBytes = Math.max(0, limitBytes - totalBytes);
+    // #region debug-point A:limit-block
+    void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "A", location: "app/api/media/upload/route.ts:59", msg: "[DEBUG] media upload blocked by storage limit", data: { remainingBytes, fileSize, totalBytes, limitBytes }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
     return NextResponse.json(
       {
         erro:
@@ -59,6 +75,9 @@ export async function POST(request: Request) {
 
   const bucket = getR2Bucket();
 
+  // #region debug-point C:r2-put-start
+  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "C", location: "app/api/media/upload/route.ts:72", msg: "[DEBUG] starting r2 put object", data: { bucket, r2Key, contentType: mimeType || file.type || "application/octet-stream", fileSize }, ts: Date.now() }) }).catch(() => {});
+  // #endregion
   await getR2Client().send(
     new PutObjectCommand({
       Bucket: bucket,
@@ -66,7 +85,15 @@ export async function POST(request: Request) {
       Body: buffer,
       ContentType: mimeType || file.type || "application/octet-stream",
     }),
-  );
+  ).catch((error) => {
+    // #region debug-point C:r2-put-error
+    void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "C", location: "app/api/media/upload/route.ts:80", msg: "[DEBUG] r2 put object failed", data: { bucket, r2Key, error: error instanceof Error ? error.message : String(error) }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
+    throw error;
+  });
+  // #region debug-point C:r2-put-ok
+  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "C", location: "app/api/media/upload/route.ts:84", msg: "[DEBUG] r2 put object succeeded", data: { bucket, r2Key }, ts: Date.now() }) }).catch(() => {});
+  // #endregion
 
   const supabase = getSupabaseServerClient();
   const publicUrl = `/api/media/${id}`;
@@ -95,10 +122,17 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
+    // #region debug-point D:supabase-insert-error
+    void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "D", location: "app/api/media/upload/route.ts:113", msg: "[DEBUG] media metadata insert failed", data: { id, r2Key, error: error.message }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
     return NextResponse.json({ erro: error.message }, { status: 500 });
   }
 
   const media = data as MediaRow;
+
+  // #region debug-point D:supabase-insert-ok
+  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "pre-fix", hypothesisId: "D", location: "app/api/media/upload/route.ts:121", msg: "[DEBUG] media metadata insert succeeded", data: { id: media.id, r2Key: media.r2_key }, ts: Date.now() }) }).catch(() => {});
+  // #endregion
 
   return NextResponse.json({
     id: media.id,
