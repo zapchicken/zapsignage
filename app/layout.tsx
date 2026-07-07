@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ZapChicken Digital Signage",
   description: "Painel e player de digital signage da ZapChicken",
+  icons: {
+    icon: "/tv-favicon.svg",
+    shortcut: "/tv-favicon.svg",
+    apple: "/tv-favicon.svg",
+  },
 };
 
 export default function RootLayout({
