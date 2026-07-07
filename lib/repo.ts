@@ -82,7 +82,7 @@ export async function addMedia(input: {
     method: "POST",
     body: form,
   });
-  if (!res.ok) throw new Error("Falha ao enviar a mídia.");
+  if (!res.ok) throw new Error(await readJsonError(res));
   const item = (await res.json()) as MediaItem;
   return item;
 }

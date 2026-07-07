@@ -1,7 +1,7 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
 import { requireAdminSessionJson } from "@/lib/admin-auth";
-import { getR2Bucket, getR2Client } from "@/lib/r2";
+import { getR2Bucket, getR2Client, getR2StorageLimitBytes, getR2UsageBytes } from "@/lib/r2";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 
 type MediaRow = {
@@ -40,6 +40,23 @@ export async function POST(request: Request) {
   const prefix = tipo === "video" ? "videos" : "imagens";
   const r2Key = `${prefix}/${id}-${safeName}`;
   const buffer = Buffer.from(await file.arrayBuffer());
+  const fileSize = buffer.byteLength;
+  const limitBytes = getR2StorageLimitBytes();
+  const { totalBytes } = await getR2UsageBytes();
+
+  if (totalBytes + fileSize > limitBytes) {
+    const remainingBytes = Math.max(0, limitBytes - totalBytes);
+    return NextResponse.json(
+      {
+        erro:
+          remainingBytes > 0
+            ? `Upload bloqueado: restam ${remainingBytes} bytes antes do limite configurado do R2.`
+            : "Upload bloqueado: o limite configurado do R2 foi atingido.",
+      },
+      { status: 400 },
+    );
+  }
+
   const bucket = getR2Bucket();
 
   await getR2Client().send(
