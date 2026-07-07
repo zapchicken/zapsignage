@@ -17,14 +17,14 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
         size === "md" ? "h-10 px-4 text-sm" : "h-8 px-3 text-xs",
         variant === "primary" &&
-          "bg-accent text-black hover:bg-accent-2 border border-transparent",
+          "border border-transparent bg-accent text-black shadow-sm hover:bg-accent-2",
         variant === "secondary" &&
-          "bg-card border border-border hover:bg-muted text-foreground",
-        variant === "ghost" && "hover:bg-muted text-foreground",
-        variant === "danger" && "bg-danger text-white hover:opacity-90",
+          "border border-border bg-card text-foreground hover:bg-muted",
+        variant === "ghost" && "text-foreground hover:bg-muted",
+        variant === "danger" && "bg-danger text-white hover:brightness-110",
         className,
       )}
       {...props}

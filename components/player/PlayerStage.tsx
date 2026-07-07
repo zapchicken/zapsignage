@@ -100,7 +100,7 @@ function ZoneMedia({
 
   if (!block || !media || !url) {
     return (
-      <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
+      <div className="flex h-full w-full items-center justify-center text-sm text-foreground/72">
         Sem conteúdo
       </div>
     );
@@ -155,7 +155,7 @@ function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
 
   if (!block || !url) {
     return (
-      <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
+      <div className="flex h-full w-full items-center justify-center text-sm text-foreground/72">
         Sem stream
       </div>
     );
@@ -230,7 +230,7 @@ function ZoneTicker({
     let alive = true;
 
     const run = async () => {
-      if (alive) setStatus("Carregando RSS…");
+      if (alive) setStatus("Carregando RSS...");
       const urls = rssIds
         .map((id) => fontes.find((f) => f.id === id))
         .filter(Boolean)
@@ -251,9 +251,9 @@ function ZoneTicker({
         proporcaoNoticiasParaMensagem: 2,
       });
 
-      const textoLocal = textosFixos.length ? `${textosFixos.join(" • ")} • ` : "";
+      const textoLocal = textosFixos.length ? `${textosFixos.join(" ⬢ ")} ⬢ ` : "";
       const fallbackMarketing = montarTickerTexto({ noticias: [], mensagens });
-      const final = textoLocal || textoRss || fallbackMarketing || "Configure RSS e/ou Mensagens • ";
+      const final = textoLocal || textoRss || fallbackMarketing || "Configure RSS e/ou Mensagens ⬢ ";
 
       let nextStatus = "";
       if (textoLocal) nextStatus = "Texto";
@@ -335,7 +335,7 @@ function ZoneTicker({
       </div>
       {(status.startsWith("Falha") ||
         status === "Sem conteúdo" ||
-        status === "Carregando RSS…") && (
+        status === "Carregando RSS...") && (
         <div className="absolute right-2 top-2 rounded bg-black/60 px-2 py-1 text-[10px] text-white/80">
           {status}
         </div>
@@ -461,13 +461,13 @@ export function PlayerStage() {
   return (
     <div ref={stageRef} className="fixed inset-0 bg-black">
       {!hidratado || !settings ? (
-        <div className="flex h-full w-full items-center justify-center text-sm text-zinc-300">
-          Carregando…
+        <div className="flex h-full w-full items-center justify-center text-sm text-foreground/72">
+          Carregando...
         </div>
       ) : !layoutId ? (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-sm text-zinc-300">
+        <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-sm text-foreground/72">
           <div>Nenhum layout definido para exibição.</div>
-          <div className="text-xs text-zinc-400">
+          <div className="text-xs text-foreground/60">
             Configure a timeline global ou um agendamento.
           </div>
         </div>
@@ -509,4 +509,5 @@ export function PlayerStage() {
     </div>
   );
 }
+
 

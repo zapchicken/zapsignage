@@ -23,7 +23,7 @@ export function Switch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-11 items-center rounded-full border border-border transition-colors disabled:opacity-50",
+        "relative inline-flex h-6 w-11 items-center rounded-full border border-border/70 transition-colors disabled:opacity-50",
         checked ? "bg-accent" : "bg-muted",
         className,
       )}

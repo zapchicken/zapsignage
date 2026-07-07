@@ -9,7 +9,7 @@ import { useAppStore } from "@/lib/store";
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted p-4">
-      <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+      <div className="text-xs font-semibold text-foreground/72">
         {label}
       </div>
       <div className="text-2xl font-semibold">{value}</div>
@@ -33,7 +33,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="text-2xl font-semibold tracking-tight">Dashboard</div>
-          <div className="text-sm text-zinc-600 dark:text-zinc-300">
+          <div className="text-sm text-foreground/72">
             Visão geral do seu sistema de exibição
           </div>
         </div>
@@ -63,8 +63,8 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             <div className="h-2.5 w-2.5 rounded-full bg-success" />
             <div className="text-sm font-semibold">Online</div>
-            <div className="text-sm text-zinc-500 dark:text-zinc-400">
-              Última atualização: {ultimaAtualizacao || "—"}
+            <div className="text-sm text-foreground/60">
+              Última atualização: {ultimaAtualizacao || "-"}
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -82,7 +82,7 @@ export default function DashboardPage() {
 
         <Card title="Preview Atual" description="Simulação simples da TV">
           <div className="aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
-            <div className="flex h-full items-center justify-center text-sm text-zinc-300">
+            <div className="flex h-full items-center justify-center text-sm text-foreground/72">
               Abra o Player para ver a execução real
             </div>
           </div>
@@ -91,4 +91,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
 

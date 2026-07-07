@@ -15,16 +15,17 @@ export function Card({
   className?: string;
 }) {
   return (
-    <section className={cn("rounded-2xl border border-border bg-card", className)}>
+    <section
+      className={cn(
+        "rounded-2xl border border-border/70 bg-card shadow-[0_8px_30px_rgba(17,24,39,0.06)]",
+        className,
+      )}
+    >
       {(title || description || actions) && (
-        <div className="flex flex-col gap-1 border-b border-border px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-1 border-b border-border/60 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             {title && <div className="text-base font-semibold">{title}</div>}
-            {description && (
-              <div className="mt-0.5 text-sm text-zinc-600 dark:text-zinc-300">
-                {description}
-              </div>
-            )}
+            {description && <div className="mt-0.5 text-sm text-foreground/72">{description}</div>}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>

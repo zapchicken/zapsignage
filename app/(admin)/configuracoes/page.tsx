@@ -44,8 +44,8 @@ export default function ConfiguracoesPage() {
 
   if (!draft) {
     return (
-      <div className="flex w-full flex-1 items-center justify-center text-sm text-zinc-500">
-        Carregando configurações…
+      <div className="flex w-full flex-1 items-center justify-center text-sm text-foreground/60">
+        Carregando configurações...
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function ConfiguracoesPage() {
               <div className="text-sm font-semibold">Geral</div>
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Resolução
                   </div>
                   <Select
@@ -83,7 +83,7 @@ export default function ConfiguracoesPage() {
                   </Select>
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Efeito de transição
                   </div>
                   <Select
@@ -110,7 +110,7 @@ export default function ConfiguracoesPage() {
                   </Select>
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Volume ({Math.round(draft.volume * 100)}%)
                   </div>
                   <input
@@ -129,7 +129,7 @@ export default function ConfiguracoesPage() {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="text-sm font-semibold">Iniciar em tela cheia</div>
-                      <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <div className="text-xs text-foreground/60">
                         Recomendado para TV Box / PC kiosk
                       </div>
                     </div>
@@ -150,7 +150,7 @@ export default function ConfiguracoesPage() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-sm font-semibold">Ativar modo emergência</div>
-                    <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <div className="text-xs text-foreground/60">
                       Força um layout específico imediatamente
                     </div>
                   </div>
@@ -160,7 +160,7 @@ export default function ConfiguracoesPage() {
                   />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Layout de emergência
                   </div>
                   <Select
@@ -173,7 +173,7 @@ export default function ConfiguracoesPage() {
                     }
                     disabled={!draft.modoEmergenciaAtivo}
                   >
-                    <option value="">Selecione…</option>
+                    <option value="">Selecione...</option>
                     {layoutsAtivos.map((l) => (
                       <option key={l.id} value={l.id}>
                         {l.nome}
@@ -181,7 +181,7 @@ export default function ConfiguracoesPage() {
                     ))}
                   </Select>
                 </div>
-                <div className="rounded-xl border border-border bg-card p-3 text-xs text-zinc-600 dark:text-zinc-300">
+                <div className="rounded-xl border border-border bg-card p-3 text-xs text-foreground/72">
                   Se o modo emergência estiver ativo, o Player ignora timeline global e agendamentos.
                 </div>
               </div>
@@ -192,4 +192,5 @@ export default function ConfiguracoesPage() {
     </div>
   );
 }
+
 

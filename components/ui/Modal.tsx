@@ -32,22 +32,22 @@ export function Modal({
       <button
         type="button"
         onClick={onClose}
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/65"
         aria-label="Fechar"
       />
       <div
         className={cn(
-          "relative w-full max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-xl",
+          "relative w-full max-w-3xl overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_24px_80px_rgba(0,0,0,0.38)]",
           className,
         )}
       >
         {title && (
-          <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
+          <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-4">
             <div className="text-sm font-semibold">{title}</div>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md px-2 py-1 text-sm hover:bg-muted"
+              className="rounded-md px-2 py-1 text-sm text-foreground/80 hover:bg-muted"
             >
               Fechar
             </button>

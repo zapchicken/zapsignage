@@ -53,19 +53,19 @@ export default function LayoutsPage() {
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <Input
-              placeholder="Nome do layout…"
+              placeholder="Nome do layout..."
               value={nome}
               onChange={(e) => setNome(e.target.value)}
             />
           </div>
           <div className="lg:col-span-6">
-            <Input placeholder="Buscar…" value={busca} onChange={(e) => setBusca(e.target.value)} />
+            <Input placeholder="Buscar..." value={busca} onChange={(e) => setBusca(e.target.value)} />
           </div>
         </div>
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+            <thead className="bg-muted text-xs font-semibold text-foreground/72">
               <tr>
                 <th className="px-4 py-3">Nome</th>
                 <th className="px-4 py-3">Zonas</th>
@@ -81,7 +81,7 @@ export default function LayoutsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Switch checked={l.ativo} onChange={(v) => void alternar(l.id, v)} />
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <span className="text-xs text-foreground/60">
                         {l.ativo ? "Ativo" : "Inativo"}
                       </span>
                     </div>
@@ -103,7 +103,7 @@ export default function LayoutsPage() {
               ))}
               {!lista.length && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-foreground/72">
                     Nenhum layout criado ainda.
                   </td>
                 </tr>
@@ -115,4 +115,5 @@ export default function LayoutsPage() {
     </div>
   );
 }
+
 

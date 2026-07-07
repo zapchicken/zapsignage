@@ -16,6 +16,7 @@ export function AccessForm({ nextUrl }: { nextUrl: string }) {
     <Card
       title="Acesso administrativo"
       description="Digite a senha para liberar o painel de gerenciamento."
+      className="border-border/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--card)_92%,var(--accent)_8%),var(--card))]"
     >
       <form
         className="flex flex-col gap-4"

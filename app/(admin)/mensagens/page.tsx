@@ -28,7 +28,7 @@ export default function MensagensPage() {
     <div className="flex w-full flex-col gap-6">
       <Card
         title="Mensagens de Marketing"
-        description="Mensagens para misturar com RSS no ticker (regra 2 notícias → 1 mensagem)"
+        description="Mensagens para misturar com RSS no ticker (regra 2 notícias -> 1 mensagem)"
         actions={
           <Button
             variant="primary"
@@ -48,7 +48,7 @@ export default function MensagensPage() {
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Input
-              placeholder="Texto da mensagem…"
+              placeholder="Texto da mensagem..."
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
             />
@@ -63,7 +63,7 @@ export default function MensagensPage() {
           </div>
           <div className="lg:col-span-3">
             <Input
-              placeholder="Buscar…"
+              placeholder="Buscar..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
@@ -72,7 +72,7 @@ export default function MensagensPage() {
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+            <thead className="bg-muted text-xs font-semibold text-foreground/72">
               <tr>
                 <th className="px-4 py-3">Mensagem</th>
                 <th className="px-4 py-3">Peso</th>
@@ -92,7 +92,7 @@ export default function MensagensPage() {
                         onChange={(v) => void alternarAtiva(m.id, v)}
                         label="Ativo"
                       />
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <span className="text-xs text-foreground/60">
                         {m.ativo ? "Ativo" : "Inativo"}
                       </span>
                     </div>
@@ -108,7 +108,7 @@ export default function MensagensPage() {
               ))}
               {!filtradas.length && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-foreground/72">
                     Nenhuma mensagem cadastrada.
                   </td>
                 </tr>
@@ -120,4 +120,5 @@ export default function MensagensPage() {
     </div>
   );
 }
+
 

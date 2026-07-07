@@ -46,7 +46,7 @@ export default function AgendamentosPage() {
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <Select value={layoutId} onChange={(e) => setLayoutId(e.target.value)}>
-              <option value="">Selecione um layout…</option>
+              <option value="">Selecione um layout...</option>
               {layouts
                 .filter((l) => l.ativo)
                 .slice()
@@ -68,7 +68,7 @@ export default function AgendamentosPage() {
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+            <thead className="bg-muted text-xs font-semibold text-foreground/72">
               <tr>
                 <th className="px-4 py-3">Layout</th>
                 <th className="px-4 py-3">Início</th>
@@ -95,7 +95,7 @@ export default function AgendamentosPage() {
               ))}
               {!lista.length && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-foreground/72">
                     Nenhum agendamento criado.
                   </td>
                 </tr>
@@ -107,4 +107,5 @@ export default function AgendamentosPage() {
     </div>
   );
 }
+
 

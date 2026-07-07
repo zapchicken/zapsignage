@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f7fb;
+  --background: #fff7eb;
   --foreground: #111827;
   --card: #ffffff;
-  --muted: #eef0f6;
-  --border: #e5e7eb;
-  --accent: #f59e0b;
-  --accent-2: #fb923c;
-  --success: #16a34a;
-  --danger: #dc2626;
+  --muted: #fde7c7;
+  --border: #f8ca00;
+  --accent: #f8ca00;
+  --accent-2: #ff8000;
+  --success: #8a9b0f;
+  --danger: #800000;
 }
 
 @theme inline {
@@ -28,16 +28,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1020;
-    --foreground: #e5e7eb;
-    --card: #0f172a;
-    --muted: #111c36;
-    --border: #1f2a44;
-    --accent: #f59e0b;
-    --accent-2: #fb923c;
-    --success: #22c55e;
-    --danger: #ef4444;
+    --background: #111827;
+    --foreground: #fff7eb;
+    --card: #1c1308;
+    --muted: #2a1a0a;
+    --border: #6f4a12;
+    --accent: #f8ca00;
+    --accent-2: #ff8000;
+    --success: #8a9b0f;
+    --danger: #800000;
   }
+}
+
+html {
+  color-scheme: light dark;
 }
 
 body {
@@ -48,6 +52,11 @@ body {
 
 * {
   outline-color: color-mix(in oklab, var(--accent) 75%, transparent);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 38%, white 8%);
+  color: #111827;
 }
 
 @keyframes fadeIn {

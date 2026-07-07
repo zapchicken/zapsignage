@@ -266,8 +266,8 @@ function ZoneCanvas({
         <div className="absolute left-3 bottom-3 rounded-lg bg-black/60 px-3 py-2 text-xs text-white">
           <div className="font-semibold">Zona selecionada</div>
           <div className="text-white/90">
-            X {formatPct(selected.posX)} • Y {formatPct(selected.posY)} • W{" "}
-            {formatPct(selected.width)} • H {formatPct(selected.height)}
+            X {formatPct(selected.posX)} ⬢ Y {formatPct(selected.posY)} ⬢ W{" "}
+            {formatPct(selected.width)} ⬢ H {formatPct(selected.height)}
           </div>
         </div>
       )}
@@ -348,7 +348,7 @@ function ZoneEditor({
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-between">
-                    <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                    <div className="text-xs font-semibold text-foreground/72">
                       Tamanho da fonte ({Math.round(draft.tickerFontePx ?? 22)}px)
                     </div>
                   </div>
@@ -366,7 +366,7 @@ function ZoneEditor({
                 </div>
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-between">
-                    <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                    <div className="text-xs font-semibold text-foreground/72">
                       Velocidade (duração por volta): {Math.round(draft.tickerDuracaoSegundos ?? 60)}s
                     </div>
                   </div>
@@ -386,7 +386,7 @@ function ZoneEditor({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Cor do texto
                   </div>
                   <div className="mt-2 flex items-center gap-3">
@@ -403,7 +403,7 @@ function ZoneEditor({
                   </div>
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Padding horizontal ({Math.round(draft.tickerPaddingX ?? 16)}px)
                   </div>
                   <input
@@ -419,7 +419,7 @@ function ZoneEditor({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Padding vertical ({Math.round(draft.tickerPaddingY ?? 8)}px)
                   </div>
                   <input
@@ -435,7 +435,7 @@ function ZoneEditor({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                  <div className="text-xs font-semibold text-foreground/72">
                     Cor de fundo
                   </div>
                   <div className="mt-2 flex items-center gap-3">
@@ -650,7 +650,7 @@ export default function ZonasPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="flex flex-col gap-3">
             <Select value={layoutId} onChange={(e) => setLayoutId(e.target.value)}>
-              <option value="">Selecione um layout…</option>
+              <option value="">Selecione um layout...</option>
               {layouts
                 .slice()
                 .sort((a, b) => a.nome.localeCompare(b.nome))
@@ -709,11 +709,11 @@ export default function ZonasPage() {
             </div>
 
             <div className="rounded-2xl border border-border bg-muted p-4 text-sm">
-              <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+              <div className="text-xs font-semibold text-foreground/72">
                 Dica rápida
               </div>
-              <div className="mt-1 text-zinc-700 dark:text-zinc-200">
-                Use valores em % (0–100) para montar layouts responsivos.
+              <div className="mt-1 text-foreground/84">
+                Use valores em % (0-100) para montar layouts responsivos.
               </div>
             </div>
           </div>
@@ -724,12 +724,12 @@ export default function ZonasPage() {
                 <div className="text-sm font-semibold">
                   {layoutSelecionado ? layoutSelecionado.nome : "Preview"}
                 </div>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                <div className="text-xs text-foreground/60">
                   {zonasDoLayout.length} zonas
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                <div className="text-xs text-foreground/60">
                   Snap
                 </div>
                 <Switch checked={snapAtivo} onChange={setSnapAtivo} label="Snap" />
@@ -757,7 +757,7 @@ export default function ZonasPage() {
                   <div className="text-sm font-semibold">Camadas</div>
                   <div className="mt-3 grid grid-cols-1 gap-3">
                     <div>
-                      <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                      <div className="text-xs font-semibold text-foreground/72">
                         Camada (z-index)
                       </div>
                       <Input
@@ -821,7 +821,7 @@ export default function ZonasPage() {
                   <div className="text-sm font-semibold">Controle do Ticker</div>
                   <div className="mt-3 grid grid-cols-1 gap-3">
                     <div>
-                      <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                      <div className="text-xs font-semibold text-foreground/72">
                         Tamanho da fonte ({Math.round(fonte)}px)
                       </div>
                       <input
@@ -844,7 +844,7 @@ export default function ZonasPage() {
                       />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                      <div className="text-xs font-semibold text-foreground/72">
                         Velocidade (duração por volta): {Math.round(duracao)}s
                       </div>
                       <input
@@ -868,7 +868,7 @@ export default function ZonasPage() {
                     </div>
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
-                        <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                        <div className="text-xs font-semibold text-foreground/72">
                           Cor do texto
                         </div>
                         <Input
@@ -902,7 +902,7 @@ export default function ZonasPage() {
                       />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                      <div className="text-xs font-semibold text-foreground/72">
                         Padding horizontal ({Math.round(padX)}px)
                       </div>
                       <input
@@ -925,7 +925,7 @@ export default function ZonasPage() {
                       />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                      <div className="text-xs font-semibold text-foreground/72">
                         Padding vertical ({Math.round(padY)}px)
                       </div>
                       <input
@@ -949,7 +949,7 @@ export default function ZonasPage() {
                     </div>
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
-                        <div className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+                        <div className="text-xs font-semibold text-foreground/72">
                           Cor de fundo
                         </div>
                         <Input
@@ -991,7 +991,7 @@ export default function ZonasPage() {
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+            <thead className="bg-muted text-xs font-semibold text-foreground/72">
               <tr>
                 <th className="px-4 py-3">Zona</th>
                 <th className="px-4 py-3">Modo</th>
@@ -1051,14 +1051,14 @@ export default function ZonasPage() {
               ))}
               {!layoutId && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-foreground/72">
                     Selecione um layout para listar/criar zonas.
                   </td>
                 </tr>
               )}
               {layoutId && !zonasDoLayout.length && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-foreground/72">
                     Nenhuma zona criada neste layout.
                   </td>
                 </tr>
@@ -1079,4 +1079,5 @@ export default function ZonasPage() {
     </div>
   );
 }
+
 

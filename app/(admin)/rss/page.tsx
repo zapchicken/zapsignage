@@ -83,7 +83,7 @@ export default function RssPage() {
           </div>
           <div className="lg:col-span-3">
             <Input
-              placeholder="Buscar…"
+              placeholder="Buscar..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
             />
@@ -92,7 +92,7 @@ export default function RssPage() {
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-muted text-xs font-semibold text-zinc-600 dark:text-zinc-300">
+            <thead className="bg-muted text-xs font-semibold text-foreground/72">
               <tr>
                 <th className="px-4 py-3">Nome</th>
                 <th className="px-4 py-3">URL</th>
@@ -104,7 +104,7 @@ export default function RssPage() {
               {filtradas.map((f) => (
                 <tr key={f.id} className="border-t border-border">
                   <td className="px-4 py-3 font-semibold">{f.nome}</td>
-                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300">
+                  <td className="px-4 py-3 text-foreground/72">
                     <a className="hover:underline" href={f.url} target="_blank" rel="noreferrer">
                       {f.url}
                     </a>
@@ -116,7 +116,7 @@ export default function RssPage() {
                         onChange={(v) => void onSalvarAtivo(f, v)}
                         label="Ativo"
                       />
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      <span className="text-xs text-foreground/60">
                         {f.ativo ? "Ativo" : "Inativo"}
                       </span>
                     </div>
@@ -140,7 +140,7 @@ export default function RssPage() {
                         }}
                         disabled={testandoId === f.id}
                       >
-                        {testandoId === f.id ? "Testando…" : "Testar"}
+                        {testandoId === f.id ? "Testando..." : "Testar"}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => void removerFonte(f.id)}>
                         Excluir
@@ -151,7 +151,7 @@ export default function RssPage() {
               ))}
               {!filtradas.length && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-foreground/72">
                     Nenhuma fonte cadastrada.
                   </td>
                 </tr>
@@ -168,7 +168,7 @@ export default function RssPage() {
             {erroTeste ? (
               <div className="mt-2 text-sm text-danger">{erroTeste}</div>
             ) : (
-              <ul className="mt-2 list-disc pl-5 text-sm text-zinc-700 dark:text-zinc-200">
+              <ul className="mt-2 list-disc pl-5 text-sm text-foreground/84">
                 {resultadoTeste?.map((t) => <li key={t}>{t}</li>)}
               </ul>
             )}
@@ -178,4 +178,5 @@ export default function RssPage() {
     </div>
   );
 }
+
 

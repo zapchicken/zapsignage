@@ -17,12 +17,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [hidratar]);
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_94%,var(--accent)_6%),var(--background))]">
       <Sidebar />
       <div className="flex min-h-screen w-full flex-col">
         <div className="flex min-h-screen w-full flex-col px-5 py-6 sm:px-8">
           {carregando ? (
-            <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
+            <div className="flex flex-1 items-center justify-center text-sm text-foreground/65">
               Carregando…
             </div>
           ) : erroPainel ? (
