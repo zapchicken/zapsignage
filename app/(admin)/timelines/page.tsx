@@ -96,11 +96,24 @@ export default function TimelinesPage() {
   const [novoTexto, setNovoTexto] = useState("");
   const [novoStreamUrl, setNovoStreamUrl] = useState("");
   const [novoDuracao, setNovoDuracao] = useState("10");
+  const [weatherCidade, setWeatherCidade] = useState("Jaguariuna");
+  const [weatherEstado, setWeatherEstado] = useState("SP");
+  const [weatherPais, setWeatherPais] = useState("BR");
+  const [weatherDias, setWeatherDias] = useState("10");
 
   const zonaSelecionada = useMemo(
     () => (zoneId ? zonasDoLayout.find((z) => z.id === zoneId) ?? null : null),
     [zonasDoLayout, zoneId],
   );
+  const weatherWidgetUrl = useMemo(() => {
+    const params = new URLSearchParams({
+      cidade: weatherCidade.trim() || "Jaguariuna",
+      estado: weatherEstado.trim() || "SP",
+      pais: weatherPais.trim() || "BR",
+      dias: String(Math.max(1, Math.min(10, Number(weatherDias) || 10))),
+    });
+    return `/widget/tempo?${params.toString()}`;
+  }, [weatherCidade, weatherDias, weatherEstado, weatherPais]);
 
   useEffect(() => {
     if (!zonasDoLayout.length) {
@@ -353,6 +366,67 @@ export default function TimelinesPage() {
             </Button>
           </div>
         </div>
+
+        {zonaSelecionada?.modoExibicao === "stream" && (
+          <div className="mt-5 rounded-2xl border border-border bg-muted p-4">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-sm font-semibold">Widget interno de tempo</div>
+                <div className="text-xs text-zinc-600 dark:text-zinc-300">
+                  Gere uma URL pronta para usar a previsão por cidade em uma zona de stream.
+                </div>
+              </div>
+              <Button type="button" onClick={() => setNovoStreamUrl(weatherWidgetUrl)}>
+                Usar no campo acima
+              </Button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-12">
+              <div className="lg:col-span-4">
+                <Input
+                  placeholder="Cidade"
+                  value={weatherCidade}
+                  onChange={(e) => setWeatherCidade(e.target.value)}
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <Input
+                  placeholder="Estado"
+                  value={weatherEstado}
+                  onChange={(e) => setWeatherEstado(e.target.value)}
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <Input
+                  placeholder="País"
+                  value={weatherPais}
+                  onChange={(e) => setWeatherPais(e.target.value)}
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <Input
+                  placeholder="Dias"
+                  value={weatherDias}
+                  onChange={(e) => setWeatherDias(e.target.value)}
+                  inputMode="numeric"
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={() => window.open(weatherWidgetUrl, "_blank", "noopener,noreferrer")}
+                >
+                  Abrir teste
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-3 rounded-xl border border-border bg-card px-4 py-3 text-xs text-zinc-600 dark:text-zinc-300">
+              URL gerada: <span className="font-mono text-[11px]">{weatherWidgetUrl}</span>
+            </div>
+          </div>
+        )}
 
         <div className="mt-5">
           {carregando ? (

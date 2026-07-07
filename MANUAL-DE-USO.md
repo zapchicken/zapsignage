@@ -184,6 +184,15 @@ Tipos de bloco:
 - texto
 - stream
 
+Widget interno de tempo:
+
+- para exibir previsao do tempo, use uma zona do tipo `stream`
+- na tela `/timelines`, ao selecionar uma zona de stream, aparece o bloco `Widget interno de tempo`
+- informe cidade, estado, pais e quantidade de dias
+- clique em `Usar no campo acima`
+- isso gera automaticamente uma URL interna como `/widget/tempo?cidade=Jaguariuna&estado=SP&pais=BR&dias=10`
+- adicione esse bloco na timeline da zona e salve
+
 Fluxo:
 
 1. Escolha um layout
@@ -285,6 +294,15 @@ Verifique:
 - se o navegador ou TV Box permite autoplay com audio
 - se o arquivo ou stream possui audio de origem
 
+### Widget de tempo nao aparece
+
+Verifique:
+
+- se a zona foi criada como `stream`
+- se a URL do bloco aponta para `/widget/tempo`
+- se a cidade informada esta correta
+- se o dispositivo tem acesso a internet para consultar a previsao
+
 ### Layout nao toca no player
 
 Verifique:
@@ -332,3 +350,4 @@ Sempre que alterar variaveis:
 - Timelines: `/timelines`
 - Agendamentos: `/agendamentos`
 - Player: `/player`
+- Widget Tempo: `/widget/tempo?cidade=Jaguariuna&estado=SP&pais=BR&dias=10`
