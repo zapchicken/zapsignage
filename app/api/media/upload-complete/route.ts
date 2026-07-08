@@ -44,10 +44,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "Dados inválidos para concluir o upload." }, { status: 400 });
   }
 
-  // #region debug-point D:direct-upload-complete-start
-  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "post-fix", hypothesisId: "D", location: "app/api/media/upload-complete/route.ts:41", msg: "[DEBUG] direct upload completion started", data: { id, r2Key, nome, tipo }, ts: Date.now() }) }).catch(() => {});
-  // #endregion
-
   const head = await getR2Client()
     .send(
       new HeadObjectCommand({
@@ -89,18 +85,10 @@ export async function POST(request: Request) {
         }),
       )
       .catch(() => null);
-
-    // #region debug-point D:direct-upload-complete-fail
-    void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "post-fix", hypothesisId: "D", location: "app/api/media/upload-complete/route.ts:84", msg: "[DEBUG] direct upload completion failed to persist metadata", data: { id, r2Key, error: error.message }, ts: Date.now() }) }).catch(() => {});
-    // #endregion
     return NextResponse.json({ erro: error.message }, { status: 500 });
   }
 
   const media = data as MediaRow;
-
-  // #region debug-point D:direct-upload-complete-ok
-  void fetch("http://127.0.0.1:7777/event", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: "media-upload-error", runId: "post-fix", hypothesisId: "D", location: "app/api/media/upload-complete/route.ts:92", msg: "[DEBUG] direct upload completion persisted metadata", data: { id: media.id, r2Key: media.r2_key }, ts: Date.now() }) }).catch(() => {});
-  // #endregion
 
   return NextResponse.json({
     id: media.id,
