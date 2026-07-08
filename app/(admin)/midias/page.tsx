@@ -222,8 +222,8 @@ export default function MidiasPage() {
           </div>
         }
       >
-        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-12">
-          <div className="rounded-2xl border border-border bg-muted p-4 lg:col-span-4">
+        <div className="mb-5 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-muted p-4">
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60">
               Limite configurado
             </div>
@@ -234,26 +234,7 @@ export default function MidiasPage() {
               Referência do app para o plano gratuito do R2
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-muted p-4 lg:col-span-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60">
-              Limite por envio
-            </div>
-            <div className="mt-2 text-2xl font-semibold">
-              {usoMidias?.directUploadEnabled
-                ? "Upload direto para o R2"
-                : usoMidias?.platformUploadLimitBytes
-                  ? formatBytes(usoMidias.platformUploadLimitBytes)
-                  : "Sem limite do ambiente local"}
-            </div>
-            <div className="mt-1 text-sm text-foreground/72">
-              {usoMidias?.directUploadEnabled
-                ? "Arquivos seguem do navegador direto para o Cloudflare R2, contornando o limite de 4,5 MB da Vercel."
-                : usoMidias?.platformUploadLimitBytes
-                  ? "No deploy da Vercel, arquivos maiores precisam de upload direto para o R2."
-                  : "No ambiente local, o gargalo de 4,5 MB da Vercel não se aplica."}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-muted p-4 lg:col-span-4">
+          <div className="rounded-2xl border border-border bg-muted p-4">
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60">
               Uso atual
             </div>
@@ -264,7 +245,7 @@ export default function MidiasPage() {
               {usoMidias ? `${usoMidias.totalObjects} objeto(s) no bucket` : "Consultando bucket"}
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-muted p-4 lg:col-span-4">
+          <div className="rounded-2xl border border-border bg-muted p-4">
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60">
               Espaço restante
             </div>
