@@ -11,7 +11,7 @@ export function Sidebar() {
     <aside className="hidden h-screen w-64 shrink-0 border-r border-border/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--card)_92%,var(--accent)_8%),var(--card))] sm:flex sm:flex-col">
       <div className="flex items-center gap-3 px-5 py-5">
         <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] shadow-sm">
-          <img src="/logo.svg" alt="ZapChicken" className="h-8 w-8 object-contain" />
+          <img src="/tv-favicon.svg" alt="ZapChicken" className="h-8 w-8 object-contain" />
         </div>
         <div className="min-w-0">
           <div className="text-sm font-semibold leading-5">ZapChicken</div>
