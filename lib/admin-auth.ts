@@ -6,30 +6,80 @@ import { NextResponse } from "next/server";
 
 export const ADMIN_SESSION_COOKIE = "zap_admin_session";
 
-function getAdminPassword() {
-  const password = process.env.ADMIN_PASSWORD?.trim();
-  return password || null;
+type AdminCredential = {
+  username: string;
+  password: string;
+};
+
+function parseAdminUsersJson(raw: string) {
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => {
+        if (!item || typeof item !== "object") return null;
+        const username =
+          "username" in item && typeof item.username === "string"
+            ? item.username.trim()
+            : "";
+        const password =
+          "password" in item && typeof item.password === "string"
+            ? item.password.trim()
+            : "";
+        if (!username || !password) return null;
+        return { username, password } satisfies AdminCredential;
+      })
+      .filter((item): item is AdminCredential => Boolean(item));
+  } catch {
+    return [];
+  }
 }
 
-function buildSessionToken(password: string) {
+function getAdminCredentials() {
+  const rawUsers = process.env.ADMIN_USERS_JSON?.trim();
+  if (rawUsers) {
+    const parsed = parseAdminUsersJson(rawUsers);
+    if (parsed.length > 0) return parsed;
+  }
+
+  const password = process.env.ADMIN_PASSWORD?.trim();
+  if (!password) return [];
+
+  const username = process.env.ADMIN_USERNAME?.trim() || "admin";
+  return [{ username, password }];
+}
+
+function buildSessionToken(username: string, password: string) {
+  return createHash("sha256").update(`${username}:${password}`).digest("hex");
+}
+
+function buildLegacySessionToken(password: string) {
   return createHash("sha256").update(password).digest("hex");
 }
 
 export async function isAdminSessionValid() {
-  const password = getAdminPassword();
-  if (!password) return false;
+  const credentials = getAdminCredentials();
+  if (credentials.length === 0) return false;
+
   const cookieStore = await cookies();
-  return cookieStore.get(ADMIN_SESSION_COOKIE)?.value === buildSessionToken(password);
+  const currentToken = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
+  if (!currentToken) return false;
+
+  return credentials.some(({ username, password }) => {
+    return (
+      currentToken === buildSessionToken(username, password) ||
+      currentToken === buildLegacySessionToken(password)
+    );
+  });
 }
 
-export async function createAdminSession() {
-  const password = getAdminPassword();
-  if (!password) {
-    throw new Error("ADMIN_PASSWORD não configurada.");
+export async function createAdminSession(input: AdminCredential) {
+  if (!input.username || !input.password) {
+    throw new Error("Credenciais administrativas inválidas.");
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, buildSessionToken(password), {
+  cookieStore.set(ADMIN_SESSION_COOKIE, buildSessionToken(input.username, input.password), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -44,10 +94,10 @@ export async function clearAdminSession() {
 }
 
 export async function requireAdminSessionJson() {
-  const password = getAdminPassword();
-  if (!password) {
+  const credentials = getAdminCredentials();
+  if (credentials.length === 0) {
     return NextResponse.json(
-      { erro: "ADMIN_PASSWORD não configurada." },
+      { erro: "Credenciais administrativas não configuradas." },
       { status: 500 },
     );
   }
@@ -62,8 +112,17 @@ export async function requireAdminSessionJson() {
   return null;
 }
 
-export function validateAdminPassword(password: string) {
-  const expected = getAdminPassword();
-  if (!expected) return false;
-  return password === expected;
+export function validateAdminCredentials(input: {
+  username: string;
+  password: string;
+}) {
+  const username = input.username.trim();
+  const password = input.password.trim();
+  if (!username || !password) return null;
+
+  const match = getAdminCredentials().find((credential) => {
+    return credential.username === username && credential.password === password;
+  });
+
+  return match ?? null;
 }

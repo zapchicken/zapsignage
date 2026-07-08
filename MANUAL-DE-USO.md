@@ -274,8 +274,9 @@ Recomendacao:
 
 Verifique:
 
-- se a senha esta correta
-- se a variavel `ADMIN_PASSWORD` esta configurada
+- se o usuario e a senha estao corretos
+- se a variavel `ADMIN_USERS_JSON` ou `ADMIN_PASSWORD` esta configurada
+- se, no modo simples, voce esta usando o usuario padrao `admin`
 - se o deploy foi refeito apos alterar variaveis na Vercel
 
 ### Midia nao aparece
@@ -332,6 +333,8 @@ Variaveis importantes:
 - `R2_ENDPOINT`
 - `R2_ACCESS_KEY_ID`
 - `R2_SECRET_ACCESS_KEY`
+- `ADMIN_USERS_JSON`
+- `ADMIN_USERNAME`
 - `ADMIN_PASSWORD`
 
 Sempre que alterar variaveis:

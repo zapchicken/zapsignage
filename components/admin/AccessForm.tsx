@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 
 export function AccessForm({ nextUrl }: { nextUrl: string }) {
   const router = useRouter();
+  const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -15,7 +16,7 @@ export function AccessForm({ nextUrl }: { nextUrl: string }) {
   return (
     <Card
       title="Acesso administrativo"
-      description="Digite a senha para liberar o painel de gerenciamento."
+      description="Digite o usuário e a senha para liberar o painel de gerenciamento."
       className="border-border/70 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--card)_92%,var(--accent)_8%),var(--card))]"
     >
       <form
@@ -31,7 +32,7 @@ export function AccessForm({ nextUrl }: { nextUrl: string }) {
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ password }),
+              body: JSON.stringify({ username, password }),
             });
 
             const data = (await response.json().catch(() => ({}))) as { erro?: string };
@@ -49,12 +50,23 @@ export function AccessForm({ nextUrl }: { nextUrl: string }) {
         }}
       >
         <Input
+          type="text"
+          placeholder="Usuário"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          autoFocus
+        />
+
+        <Input
           type="password"
           placeholder="Senha administrativa"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoFocus
         />
+
+        <div className="text-xs text-foreground/62">
+          Se apenas a senha antiga estiver configurada, o usuário padrão é <strong>admin</strong>.
+        </div>
 
         {erro ? (
           <div className="rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
