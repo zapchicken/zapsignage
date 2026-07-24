@@ -23,6 +23,8 @@ export default function DashboardPage() {
   const midias = useAppStore((s) => s.midias);
   const fontesRss = useAppStore((s) => s.fontesRss);
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState<string>("");
+  const [previewKey, setPreviewKey] = useState(0);
+  const [previewState, setPreviewState] = useState<"running" | "paused" | "stopped">("running");
 
   useEffect(() => {
     setUltimaAtualizacao(new Date().toLocaleTimeString("pt-BR"));
@@ -80,11 +82,70 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        <Card title="Preview Atual" description="Simulação simples da TV">
-          <div className="aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
-            <div className="flex h-full items-center justify-center text-sm text-foreground/72">
-              Abra o Player para ver a execução real
+        <Card
+          title="Preview Atual"
+          description="Execução real do player dentro do painel"
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setPreviewState("running");
+                  setPreviewKey((current) => current + 1);
+                }}
+              >
+                Start
+              </Button>
+              <Button size="sm" onClick={() => setPreviewState("paused")}>
+                Pause
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setPreviewState("stopped");
+                  setPreviewKey((current) => current + 1);
+                }}
+              >
+                Stop
+              </Button>
             </div>
+          }
+        >
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
+            {layouts.length ? (
+              <>
+                {previewState === "running" ? (
+                  <iframe
+                    key={previewKey}
+                    src="/player"
+                    title="Preview do player"
+                    className="h-full w-full border-0 pointer-events-none"
+                    allow="autoplay; fullscreen"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-white/80">
+                    {previewState === "paused"
+                      ? "Preview pausado"
+                      : "Preview parado"}
+                  </div>
+                )}
+                <Link
+                  href="/player"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 z-10"
+                  aria-label="Abrir player em nova aba"
+                  title="Abrir player em nova aba"
+                />
+                <div className="pointer-events-none absolute bottom-3 right-3 z-20 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+                  Clique para abrir em nova aba
+                </div>
+              </>
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-foreground/72">
+                Crie um layout para ver o preview aqui.
+              </div>
+            )}
           </div>
         </Card>
       </div>

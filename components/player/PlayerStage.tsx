@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Hls from "hls.js";
 import { useAppStore } from "@/lib/store";
 import type { ZoneTimelineBlock } from "@/lib/types";
 import { escolherLayoutAtivo } from "@/lib/playerRuntime";
@@ -143,15 +144,74 @@ function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
   const url = block?.streamUrl?.trim();
   const volume = Math.max(0, Math.min(1, settings?.volume ?? 0.8));
   const muted = volume <= 0;
-  const isHls = url?.endsWith(".m3u8") ?? false;
+  const [erro, setErro] = useState<string>("");
+  const isHls = url ? /\.m3u8(?:$|\?)/i.test(url) : false;
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !url || !isHls) return;
+
+    let hls: Hls | null = null;
+    let disposed = false;
+    let usingNativeHls = false;
+
+    const playVideo = () => {
+      video.volume = volume;
+      video.muted = muted;
+      void video.play().catch(() => {});
+    };
+
+    setErro("");
+
+    if (Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+      });
+
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, playVideo);
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (!data.fatal) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          hls?.startLoad();
+          return;
+        }
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          hls?.recoverMediaError();
+          return;
+        }
+        if (!disposed) setErro("Nao foi possivel reproduzir este stream HLS.");
+        hls?.destroy();
+        hls = null;
+      });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      usingNativeHls = true;
+      video.src = url;
+      video.addEventListener("loadedmetadata", playVideo);
+    } else {
+      setErro("Este navegador nao oferece suporte nativo a HLS.");
+    }
+
+    return () => {
+      disposed = true;
+      if (usingNativeHls) {
+        video.removeEventListener("loadedmetadata", playVideo);
+        video.removeAttribute("src");
+        video.load();
+      } else {
+        hls?.destroy();
+      }
+    };
+  }, [block?.id, isHls, muted, url, volume]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isHls) return;
     video.volume = volume;
     video.muted = muted;
-    void video.play().catch(() => {});
-  }, [block?.id, isHls, muted, volume]);
+  }, [isHls, muted, volume]);
 
   if (!block || !url) {
     return (
@@ -163,15 +223,21 @@ function ZoneStream({ blocks }: { blocks: ZoneTimelineBlock[] }) {
 
   if (isHls) {
     return (
-      <video
-        ref={videoRef}
-        key={block.id}
-        src={url}
-        className="h-full w-full object-cover"
-        autoPlay
-        muted={muted}
-        playsInline
-      />
+      <div className="relative h-full w-full bg-black">
+        <video
+          ref={videoRef}
+          key={block.id}
+          className="h-full w-full object-cover"
+          autoPlay
+          muted={muted}
+          playsInline
+        />
+        {erro ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/70 px-4 text-center text-sm text-white/80">
+            {erro}
+          </div>
+        ) : null}
+      </div>
     );
   }
 
